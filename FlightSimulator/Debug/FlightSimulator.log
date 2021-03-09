@@ -1,2 +1,10 @@
-﻿  main.cpp
-  FlightSimulator.vcxproj -> C:\Users\Ryan\source\repos\FlightSimulator\Debug\FlightSimulator.exe
+﻿  Aircraft.cpp
+  City.cpp
+  CityDataParser.cpp
+  Flight.cpp
+  FlightDataParser.cpp
+  main.cpp
+  SimDataCollector.cpp
+  Simulation.cpp
+  Generating Code...
+  FlightSimulator.vcxproj -> C:\Users\Admin\Desktop\College\CS 307\Program 1\FlightSimulator\Debug\FlightSimulator.exe

@@ -42,3 +42,16 @@ SimDataCollector* SimDataCollector::getInstance()
 
 	return theInstance;
 }
+
+//-------------------------------------------
+// Initialize all city, flight, and aircraft
+// data needed by the simulation.
+//-------------------------------------------
+void SimDataCollector::initializeData()
+{
+	cdp = cdp->getInstance(); // Set pointer to CityDataParser object
+	fdp = fdp->getInstance(); // Set pointer to FlightDataParser object
+
+	dataFileNames = new fstream();
+	dataFileNames->open()
+}
