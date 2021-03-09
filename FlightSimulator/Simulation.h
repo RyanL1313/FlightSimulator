@@ -15,5 +15,7 @@ public:
 	void initializeSimulation();
 	void runSimulation();
 	void updateFlights();
-
+	void generateScheduledReport();
+	void generateTakeoffReport();
+	void generateLandingReport();
 };
