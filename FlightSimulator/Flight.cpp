@@ -428,9 +428,25 @@ void Flight::updateAltitude()
 	
 }
 
+//-----------------------------------------
+// Calculate when the plane will reach
+// cruise altitude (might never happen)
+// and when it needs to start descending.
+// If cruise altitude cannot be reached
+// while also having enough time to fully
+// descend, the time to start descending
+// should be the midpoint of the flight.
+//-----------------------------------------
 void Flight::calculateAltitudeChangeTimes()
 {
-	double hoursReachCruiseAlt = (m_dCruiseAltitude / m_dRateOfClimb) / 60; // Calculate how many hours it takes to reach cruise altitude
+	double hoursReachCruiseAlt = (m_dCruiseAltitude / m_dRateOfClimb) / 60.0; // Calculate how many hours it takes to reach cruise altitude
+	double hoursReachCruiseAltAndGround = hoursReachCruiseAlt * 2.0; // This is how long it takes to reach cruise altitude and reach the ground from cruise altitude
 	m_dTimeReachCruiseAlt = m_dDepartureTime + hoursReachCruiseAlt; // Gets the time in hours when this cruise altitude will be reached
-	m_dTimeStartDescending = m_dEstArrivalTime - hoursReachCruiseAlt; // Need to start descending at arrival time - hours to reach cruise altitude
+	double timeReachCruiseAltAndGround = m_dDepartureTime + hoursReachCruiseAltAndGround; // The time the plane would land if it reached cruise altitude then landed from there
+
+	if (timeReachCruiseAltAndGround >= m_dEstArrivalTime) // No time to rise to cruise altitude and land in the flight
+		m_dTimeStartDescending = (m_dDepartureTime + m_dEstArrivalTime) / 2; // The plane will descend at the midpoint of the flight
+	else
+		m_dTimeStartDescending = m_dEstArrivalTime - hoursReachCruiseAlt; // Need to start descending at arrival time - hours to reach cruise altitude
+
 }
