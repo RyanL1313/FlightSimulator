@@ -3,7 +3,7 @@
 // Implementation file for the Simulation class.
 //
 // Author: Ryan Lynch
-// Date: March 2021
+// Date: April 2021
 //========================================================
 
 #include "Simulation.h"
@@ -32,27 +32,16 @@ Simulation::~Simulation()
 }
 
 //---------------------------------------------------
-// Return how many instances of this class there are.
-//---------------------------------------------------
-int Simulation::getInstanceNumber()
-{
-	return this->m_iInstanceNumber;
-}
-
-//---------------------------------------------------
 // Returns the only instance of Simulation
 // that ever gets created.
 //---------------------------------------------------
 Simulation* Simulation::getInstance()
 {
 	static Simulation* theInstance = NULL;
-	static int counter = 1;
 
 	if (theInstance == NULL) // First time creating an instance of this class
 	{
 		theInstance = new Simulation();
-		theInstance->m_iInstanceNumber = counter;
-		counter++;
 	}
 
 	return theInstance;

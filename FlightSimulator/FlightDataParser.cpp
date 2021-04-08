@@ -2,8 +2,8 @@
 // FlightDataParser.cpp
 // Implementation file for the flight data parser class.
 //
-// Authors: Dr. Rick Coleman, Dr. Jacob Hauenstein
-// Date: January 2021
+// Author: Dr. Rick Coleman
+// Date: August 2011
 //========================================================
 #pragma warning(disable : 4996)
 
@@ -21,7 +21,9 @@ FlightDataParser::FlightDataParser()
 {
 	m_iStartHour = 0;
 	m_iStartMin = 0;
-	m_iAircraftCount = 0;
+	m_iPJetCount = 0;
+	m_iBJetCount = 0;
+	m_iSEngineCount = 0;
 	m_iFlightCount = 0;
 	m_bDataFileOK = false;
 }
@@ -33,31 +35,18 @@ FlightDataParser::~FlightDataParser()
 {
 }
 
-//------------------------------------------
-// Return how many instances of this class there are.
-//------------------------------------------
-int FlightDataParser::getInstanceNumber()
+//---------------------------------------
+// Create the singleton instance of
+//	this class.
+//---------------------------------------
+FlightDataParser *FlightDataParser::getInstance()
 {
-	return this->m_iInstanceNumber;
-}
-
-//-----------------------------------------------
-// Returns the only instance of FlightDataParser
-// that ever gets created.
-//-----------------------------------------------
-FlightDataParser* FlightDataParser::getInstance()
-{
-	static FlightDataParser* theInstance = NULL;
-	static int counter = 1;
-
-	if (theInstance == NULL) // First time creating an instance of this class
+	static FlightDataParser *instance = NULL;
+	if(instance == NULL)
 	{
-		theInstance = new FlightDataParser();
-		theInstance->m_iInstanceNumber = counter;
-		counter++;
+		instance = new FlightDataParser();
 	}
-
-	return theInstance;
+	return instance;
 }
 
 //------------------------------------------
@@ -70,7 +59,7 @@ void FlightDataParser::InitFlightData(const char *dataFile)
 	// Try to open the file
 	inFile = new fstream();
 	inFile->open(m_sFlightDataFile, fstream::in); // Open the data file
-	if (!inFile->is_open())
+	if(!inFile->is_open())
 	{
 		cout << "Failed to open the Flight Data file.\nProgram terminating...\n";
 		exit(0);
@@ -79,20 +68,20 @@ void FlightDataParser::InitFlightData(const char *dataFile)
 	// Read and count the number of planes types, flights, and get
 	//		the start hour and minute.
 	char line[128];
-	while (getNextLine(line, 127))
+	while(getNextLine(line, 127))
 	{
-		if (strcmp(line, "<STARTTIME>") == 0)
+		if(strcmp(line, "<STARTTIME>") == 0)
 		{
 			bool done = false;
-			while (!done)
+			while(!done)
 			{
 				getNextLine(line, 127); // Read the next line
-				if (strcmp(line, "<HOUR>") == 0)
+				if(strcmp(line, "<HOUR>") == 0)
 				{
 					getNextLine(line, 127); // Get hours
 					m_iStartHour = atoi(line); // Convert string to int
 				}
-				else if (strcmp(line, "<MINUTE>") == 0)
+				else if(strcmp(line, "<MINUTE>") == 0)
 				{
 					getNextLine(line, 127); // Get MINUTES
 					m_iStartMin = atoi(line); // Convert string to int
@@ -100,11 +89,17 @@ void FlightDataParser::InitFlightData(const char *dataFile)
 				}
 			}
 		}
-		else if (strcmp(line, "<PLANE>") == 0)
+		else if(strcmp(line, "<TYPE>") == 0)	// Count plane types
 		{
-			m_iAircraftCount++;	// Count all planes
+			getNextLine(line, 127); // Get TYPE
+			if(strcmp(line, "PASSENGERJET") == 0)
+					m_iPJetCount++;
+			else if(strcmp(line, "BUSINESSJET") == 0)
+					m_iBJetCount++;
+			else if(strcmp(line, "SINGLEENGINE") == 0)
+					m_iSEngineCount++;
 		}
-		else if (strcmp(line, "<FLIGHT>") == 0)
+		else if(strcmp(line, "<FLIGHT>") == 0)
 		{
 			m_iFlightCount++;	// Count all FLIGHTS
 		}
@@ -129,9 +124,19 @@ void FlightDataParser::getStartTime(int *hr, int *min)
 //------------------------------------------
 // Get the number of aircraft types
 //------------------------------------------
-int FlightDataParser::getAircraftCount()
+int FlightDataParser::getAircraftCount(AircraftType t)
 {
-	return m_iAircraftCount;
+	switch(t)
+	{
+		case PASSENGERJET :	
+			return m_iPJetCount;
+		case BUSINESSJET :	
+			return m_iBJetCount;
+		case SINGLEENGINE :	
+			return m_iSEngineCount;
+		default :
+			return 0;
+	}
 }
 
 //------------------------------------------
@@ -144,10 +149,7 @@ int FlightDataParser::getFlightCount()
 
 //---------------------------------------------------
 // Get all data on an aircraft
-// Args: t - An enumerated data type identifying
-//				the aircraft type. See
-//				AircraftTypes.h 
-//		 make - Pointer to a character array to hold
+// Args: make - Pointer to a character array to hold
 //					the name of the plane make, 
 //					example: Boeing.
 //		 desc - Pointer to a character array to hold
@@ -163,83 +165,178 @@ int FlightDataParser::getFlightCount()
 //		 ca - Pointer to a double to hold the cruise
 //					altitude.
 //---------------------------------------------------
-bool FlightDataParser::getAircraftData(char *make, char *desc,
+bool FlightDataParser::getAircraftData(AircraftType t, char *make, char *desc,
 	double *roc, double *wngs, double *len,
 	double *cs, double *ca)
 {
-	static int nextPlaneIdx = 0; // Index of the next plane to read
-	int planeIdx = 0;	// current count of planes
+	static int nextPJPlaneIdx = 0; // Index of the next passenger jet to read
+	static int nextBJPlaneIdx = 0; // Index of the next business jet to read
+	static int nextSEPlaneIdx = 0; // Index of the next single engine plane to read
+	int planePJIdx = 0;	// current count of passenger jets
+	int planeBJIdx = 0;	// current count of business jets
+	int planeSEIdx = 0;	// current count of single engine planes
+	// temporary data holders
+	char sMake[32]; // Plane make
+	char sDesc[32]; // Plane description
+	double dROC;	// Rate of climb
+	double dWngSp;	// Wing span
+	double dLen;	// Fuselage length
+	double dCS;		// Cruise Speed
+	double dCA;		// Cruise Altitude
+
+	bool typeOK = false;
+//	bool dataOK = false;
 
 	// Have we already read all plane data?
-	if (nextPlaneIdx >= m_iAircraftCount) return false;
+	switch(t)
+	{
+		case PASSENGERJET :	
+			if(nextPJPlaneIdx >= m_iPJetCount)
+				return false;
+			break;
+		case BUSINESSJET :	
+			if(nextBJPlaneIdx >= m_iBJetCount)
+				return false;
+			break;
+		case SINGLEENGINE :	
+			if(nextSEPlaneIdx >= m_iSEngineCount)
+				return false;
+			break;
+	}
 
 	// Try to open the file
 	inFile = new fstream();
 	inFile->open(m_sFlightDataFile, fstream::in); // Open the data file
-	if (!inFile->is_open())
+	if(!inFile->is_open())
 	{
 		cout << "Failed to open the Flight Data file.\nProgram terminating...\n";
 		exit(0);
 	}
 	char line[128];
 	// Find the next plane
-	while (getNextLine(line, 127))
+	while(getNextLine(line, 127))
 	{
-		if (strcmp(line, "<PLANE>") == 0)
+		if(strcmp(line, "<PLANE>") == 0)
 		{
-			// Found a plane check the index
-			if (planeIdx == nextPlaneIdx)
+			// Found a plane check the index and type
+			//if(((planePJIdx == nextPJPlaneIdx) && (t == PASSENGERJET)) ||
+			//	((planeBJIdx == nextBJPlaneIdx) && (t == BUSINESSJET)) ||
+			//	((planeSEIdx == nextSEPlaneIdx) && (t == SINGLEENGINE)))
+			//{
+//				dataOK;	// OK to save this data
+
+			// Read all the data on this plane
+			bool done = false;
+			while(!done)
 			{
-				bool done = false;
-				while (!done)
+				getNextLine(line, 127); // Read the next line
+				if(strcmp(line, "<MAKE>") == 0)
 				{
-					getNextLine(line, 127); // Read the next line
-					if (strcmp(line, "<MAKE>") == 0)
+					getNextLine(line, 127);
+					strcpy(sMake, line); // Save the aircraft make
+				}
+				else if(strcmp(line, "<TYPE>") == 0)
+				{
+					getNextLine(line, 127);
+					if((strcmp(line, "PASSENGERJET") == 0) && (t == PASSENGERJET))
 					{
-						getNextLine(line, 127);
-						strcpy(make, line); // Save the aircraft make
+						if(planePJIdx == nextPJPlaneIdx)
+							typeOK = true;
+						else
+							planePJIdx++;
 					}
-					else if (strcmp(line, "<DESCRIPTION>") == 0)
+					else if((strcmp(line, "BUSINESSJET") == 0) && (t == BUSINESSJET))
 					{
-						getNextLine(line, 127);
-						strcpy(desc, line); // Save the aircraft description
+						if(planeBJIdx == nextBJPlaneIdx)
+							typeOK = true;
+						else
+							planeBJIdx++;
 					}
-					else if (strcmp(line, "<RATEOFCLIMB>") == 0)
+					else if((strcmp(line, "SINGLEENGINE") == 0) && (t == SINGLEENGINE))
 					{
-						getNextLine(line, 127);
-						*roc = atof(line); // Save rate of climb
+						if(planeSEIdx == nextSEPlaneIdx)
+							typeOK = true;
+						else
+							planeSEIdx++;
 					}
-					else if (strcmp(line, "<WINGSPAN>") == 0)
-					{
-						getNextLine(line, 127);
-						*wngs = atof(line); // Save wing span in feet
-					}
-					else if (strcmp(line, "<LENGTH>") == 0)
-					{
-						getNextLine(line, 127);
-						*len = atof(line); // Save fuselage length in feet
-					}
-					else if (strcmp(line, "<CRUISESPEED>") == 0)
-					{
-						getNextLine(line, 127);
-						*cs = atof(line); // Save cruise speed in Miles Per Hour
-					}
-					else if (strcmp(line, "<CRUISEALTITUDE>") == 0)
-					{
-						getNextLine(line, 127);
-						*ca = atof(line); // Save cruise altitude in feet
-					}
-					else if (strcmp(line, "</PLANE>") == 0)
+				}
+				else if(strcmp(line, "<DESCRIPTION>") == 0)
+				{
+					getNextLine(line, 127);	// get the type string
+					strcpy(sDesc, line); // Save the aircraft description
+				}
+				else if(strcmp(line, "<RATEOFCLIMB>") == 0)
+				{
+					getNextLine(line, 127);
+					dROC = atof(line); // Save rate of climb
+				}
+				else if(strcmp(line, "<WINGSPAN>") == 0)
+				{
+					getNextLine(line, 127);
+					dWngSp = atof(line); // Save wing span in feet
+				}
+				else if(strcmp(line, "<LENGTH>") == 0)
+				{
+					getNextLine(line, 127);
+					dLen = atof(line); // Save fuselage length in feet
+				}
+				else if(strcmp(line, "<CRUISESPEED>") == 0)
+				{
+					getNextLine(line, 127);
+					dCS = atof(line); // Save cruise speed in Miles Per Hour
+				}
+				else if(strcmp(line, "<CRUISEALTITUDE>") == 0)
+				{
+					getNextLine(line, 127);
+					dCA = atof(line); // Save cruise altitude in feet
+				}
+				else if(strcmp(line, "</PLANE>") == 0)
+				{
+					if(typeOK) // Got the one we want
 					{
 						done = true; // Flag done reading data for this plane
-						nextPlaneIdx++; // Index for next call
+						switch(t)
+						{
+							case PASSENGERJET :	
+								nextPJPlaneIdx++;
+								break;
+							case BUSINESSJET :	
+								nextBJPlaneIdx++;
+								break;
+							case SINGLEENGINE :	
+								nextSEPlaneIdx++;
+								break;
+						}
+						// Copy the data
+						strcpy(make, sMake);
+						strcpy(desc, sDesc);
+						*roc = dROC;
+						*wngs = dWngSp;
+						*len = dLen;
+						*cs = dCS;
+						*ca = dCA;
 						inFile->close();
 						delete inFile;
 						return true;
-					}
-				} // end while not done
-			} // end if this is the index we want
-			planeIdx++; // increment count of planes
+					} // end if type OK
+				} // end else if </PLANE>
+			} // end while not done
+			//} // end if this is the index we want
+			//else
+			//{
+			//	// Read to TYPE tag and update counters
+			//	getNextLine(line, 127);
+			//	while(strcmp(line, "<TYPE>") != 0)
+			//		getNextLine(line, 127);
+			//	// Now read the type string
+			//	getNextLine(line, 127);
+			//	if(strcmp(line, "PASSENGERJET") == 0)
+			//			planePJIdx++;
+			//	else if(strcmp(line, "BUSINESSJET") == 0)
+			//			planeBJIdx++;
+			//	else if(strcmp(line, "SINGLEENGINE") == 0)
+			//			planeSEIdx++;
+			//} // end else update the counter
 		} // end if this is a PLANE tag
 	} // end while
 	return false;
@@ -272,80 +369,80 @@ bool FlightDataParser::getFlightData(char *airline, char *plane,
 {
 	static int nextFlightIdx = 0;
 	int flightIdx = 0;
-
+		
 	// Have we already read all plane data?
-	if (nextFlightIdx >= m_iFlightCount) return false;
+	if(nextFlightIdx >= m_iFlightCount) return false;
 
 
 	// Try to open the file
 	inFile = new fstream();
 	inFile->open(m_sFlightDataFile, fstream::in); // Open the data file
-	if (!inFile->is_open())
+	if(!inFile->is_open())
 	{
 		cout << "Failed to open the Flight Data file.\nProgram terminating...\n";
 		exit(0);
 	}
 	char line[128];
 	// Find the next flight
-	while (getNextLine(line, 127))
+	while(getNextLine(line, 127))
 	{
-		if (strcmp(line, "<FLIGHT>") == 0)
+		if(strcmp(line, "<FLIGHT>") == 0)
 		{
 			// Found a plane check the index
-			if (flightIdx == nextFlightIdx)
+			if(flightIdx == nextFlightIdx) 
 			{
 				bool done = false;
-				while (!done)
+				while(!done)
 				{
 					getNextLine(line, 127); // Read the next line
-					if (strcmp(line, "<AIRLINE>") == 0)
+					if(strcmp(line, "<AIRLINE>") == 0)
 					{
 						getNextLine(line, 127);
 						strcpy(airline, line); // Save the airline name
 					}
-					else if (strcmp(line, "<PLANETYPE>") == 0)
+					else if(strcmp(line, "<PLANEMAKE>") == 0)
 					{
 						getNextLine(line, 127);
 						strcpy(plane, line); // Save the plane type
 					}
-					else if (strcmp(line, "<FLIGHTNUMBER>") == 0)
+					else if(strcmp(line, "<FLIGHTNUMBER>") == 0)
 					{
 						getNextLine(line, 127);
 						*flNum = atoi(line); // Save flight number
 					}
-					else if (strcmp(line, "<DEPARTSFROM>") == 0)
+					else if(strcmp(line, "<DEPARTSFROM>") == 0)
 					{
 						getNextLine(line, 127);
 						strcpy(departCity, line); // Save departure city symbol
 					}
-					else if (strcmp(line, "<DEPARTURETIME>") == 0)
+					else if(strcmp(line, "<DEPARTURETIME>") == 0)
 					{
 						bool done2 = false;
-						while (!done2)
+						while(!done2)
 						{
 							getNextLine(line, 127); // Read the next line
-							if (strcmp(line, "<HOUR>") == 0)
+							if(strcmp(line, "<HOUR>") == 0)
 							{
 								getNextLine(line, 127); // Get hour
 								*depHr = atoi(line); // Convert string to int
 							}
-							else if (strcmp(line, "<MINUTE>") == 0)
+							else if(strcmp(line, "<MINUTE>") == 0)
 							{
 								getNextLine(line, 127); // Get minute
 								*depMin = atoi(line); // Convert string to int
 							}
-							else if (strcmp(line, "</DEPARTURETIME>") == 0)
+							else if(strcmp(line, "</DEPARTURETIME>") == 0)
 							{
 								done2 = true; // Flag we are done getting time
 							}
 						}
 					}
-					else if (strcmp(line, "<DESTINATION>") == 0)
+					else if(strcmp(line, "<DESTINATION>") == 0)
 					{
 						getNextLine(line, 127);
 						strcpy(destCity, line); // Save destination city symbol
 					}
-					else if (strcmp(line, "</FLIGHT>") == 0)
+					else if(strcmp(line, "</FLIGHT>") == 0)
 					{
 						done = true; // Flag done reading data for this FLIGHT
 						nextFlightIdx++; // Index for next call
@@ -376,39 +473,39 @@ bool FlightDataParser::getFlightData(char *airline, char *plane,
 //------------------------------------------------
 bool FlightDataParser::getNextLine(char *buffer, int n)
 {
-	bool    done = false;
+    bool    done = false;
 	char    tempBuf[128];
 	char	*temp;
-	while (!done)
-	{
-		inFile->getline(tempBuf, n); // Read a line from the file
+    while(!done)
+    {
+        inFile->getline(tempBuf, n); // Read a line from the file
 
-		if (inFile->good())          // If a line was successfully read check it
-		{
-			if (strlen(tempBuf) == 0)     // Skip any blank lines
-				continue;
-			else if (strncmp(tempBuf, "<!--", 4) == 0) // Skip comment lines
-				continue;
-			else done = true;    // Got a valid data line so return with this line
-		}
-		else
-		{
-			strcpy(buffer, "");  // Clear the buffer array
-			return false;        // Flag end of file
-		}
-	} // end while
+        if(inFile->good())          // If a line was successfully read check it
+        {
+           if(strlen(tempBuf) == 0)     // Skip any blank lines
+               continue;
+		   else if(strncmp(tempBuf, "<!--", 4) == 0) // Skip comment lines
+			   continue;
+           else done = true;    // Got a valid data line so return with this line
+        }
+        else
+        {
+            strcpy(buffer, "");  // Clear the buffer array
+            return false;        // Flag end of file
+        }
+    } // end while
 	// Remove white space from end of string
 	temp = &tempBuf[strlen(tempBuf)]; // point to closing \0
 	temp--; // back up 1 space
-	while (isspace(*temp))
+	while(isspace(*temp))
 	{
 		*temp = '\0'; // Make it another NULL terminator
 		temp--;  // Back up 1 char
 	}
 	// Remove white space from front of string
 	temp = tempBuf;
-	while (isspace(*temp)) temp++; // Skip leading white space
+	while(isspace(*temp)) temp++; // Skip leading white space
 	// Copy remainder of string into the buffer
 	strcpy(buffer, temp);
-	return true;  // Flag a successful read
+    return true;  // Flag a successful read
 }

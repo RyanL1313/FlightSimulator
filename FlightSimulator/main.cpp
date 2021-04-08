@@ -2,6 +2,8 @@
 // main.cpp
 // Main class for the program.
 //
+// Programming Assignment 2
+//
 // This program simulates the takeoff and landing
 // of flights. Data about flights and the cities
 // and aircraft involved in these flights are read
@@ -21,7 +23,7 @@
 // provided by Dr. Hauenstein.
 //
 // Author: Ryan Lynch
-// Date: March 2021
+// Date: April 2021
 //===================================================
 
 #include <iostream>

@@ -3,7 +3,7 @@
 // Implementation file for the SimDataCollector class.
 //
 // Author: Ryan Lynch
-// Date: March 2021
+// Date: April 2021
 //========================================================
 
 #pragma warning(disable : 4018)
@@ -26,9 +26,9 @@ SimDataCollector::SimDataCollector()
 SimDataCollector::~SimDataCollector()
 {
 	// Delete the parser/file pointers
-	delete fdp;
-	delete cdp;
-	delete dataFileNamesGetter;
+	delete m_fdp;
+	delete m_cdp;
+	delete m_dataFileNamesGrabber;
 
 	for (int i = 0; i < m_iCityCount; i++)
 	{
@@ -37,7 +37,7 @@ SimDataCollector::~SimDataCollector()
 
 	for (int i = 0; i < m_iAircraftCount; i++)
 	{
-		delete m_vAircrafts[i]; // Delete an aircraft object pointer in m_vAircrafts
+		delete m_vSharedAircrafts[i]; // Delete an aircraft object pointer in m_vAircrafts
 	}
 
 	for (int i = 0; i < m_iFlightCount; i++)
@@ -53,14 +53,6 @@ SimDataCollector::~SimDataCollector()
 	}
 }
 
-//---------------------------------------------------
-// Return how many instances of this class there are.
-//---------------------------------------------------
-int SimDataCollector::getInstanceNumber()
-{
-	return this->m_iInstanceNumber;
-}
-
 //-----------------------------------------------
 // Returns the only instance of SimDataCollector
 // that ever gets created.
@@ -68,13 +60,10 @@ int SimDataCollector::getInstanceNumber()
 SimDataCollector* SimDataCollector::getInstance()
 {
 	static SimDataCollector* theInstance = NULL;
-	static int counter = 1;
 
 	if (theInstance == NULL) // First time creating an instance of this class
 	{
 		theInstance = new SimDataCollector();
-		theInstance->m_iInstanceNumber = counter;
-		counter++;
 	}
 
 	return theInstance;
@@ -86,21 +75,24 @@ SimDataCollector* SimDataCollector::getInstance()
 //-------------------------------------------
 void SimDataCollector::initializeData()
 {
-	cdp = cdp->getInstance(); // Set pointer to the CityDataParser object
-	fdp = fdp->getInstance(); // Set pointer to the FlightDataParser object
+	m_cdp = m_cdp->getInstance(); // Set pointer to the CityDataParser object
+	m_fdp = m_fdp->getInstance(); // Set pointer to the FlightDataParser object
 	setDataFileNames(); // Set the char arrays containing the XML data file names
 
 	// Initialize parser data
-	cdp->InitCityData(m_sCityDataFileName);
-	fdp->InitFlightData(m_sFlightDataFileName);
+	m_cdp->InitCityData(m_sCityDataFileName);
+	m_fdp->InitFlightData(m_sFlightDataFileName);
 
 	setSimSpeedMultiplier(); // Get the simulation speed entered by the user
 	setSimStartTime(); // Set the simulation's start hour and minute
 
 	// Set the counts of all object types
-	m_iCityCount = cdp->getCityCount();
-	m_iAircraftCount = fdp->getAircraftCount();
-	m_iFlightCount = fdp->getFlightCount();
+	m_iCityCount = m_cdp->getCityCount();
+	m_iPAircraftCount = m_fdp->getAircraftCount(AircraftType::SINGLEENGINE);
+	m_iBAircraftCount = m_fdp->getAircraftCount(AircraftType::BUSINESSJET);
+	m_iSEAircraftCount = m_fdp->getAircraftCount(AircraftType::SINGLEENGINE);
+	m_iAircraftCount = m_iPAircraftCount + m_iBAircraftCount + m_iSEAircraftCount; // Count of all types added together
+	m_iFlightCount = m_fdp->getFlightCount();
 
 	setAllCityData(); // Populates m_vCities with City objects
 	setAllAircraftData(); // Populates m_vAircrafts with Aircraft objects
@@ -118,18 +110,18 @@ void SimDataCollector::setDataFileNames()
 	cout << "Enter the name of the text file containing the city and flight data file names:" << endl;
 	cin >> m_sDataFiles;
 
-	dataFileNamesGetter = new fstream();
-	dataFileNamesGetter->open(m_sDataFiles, fstream::in);
+	m_dataFileNamesGrabber = new fstream();
+	m_dataFileNamesGrabber->open(m_sDataFiles, fstream::in);
 
-	if (!dataFileNamesGetter->is_open())
+	if (!m_dataFileNamesGrabber->is_open())
 	{
 		cout << "The data file containing the names of the XML data files could not be opened. Exiting program..." << endl;
 		exit(0);
 	}
 
 	// Read each file name from the file
-	dataFileNamesGetter->getline(m_sCityDataFileName, 64);
-	dataFileNamesGetter->getline(m_sFlightDataFileName, 64);
+	m_dataFileNamesGrabber->getline(m_sCityDataFileName, 64);
+	m_dataFileNamesGrabber->getline(m_sFlightDataFileName, 64);
 }
 
 //-------------------------------------------------------
@@ -158,7 +150,7 @@ void SimDataCollector::setSimSpeedMultiplier()
 //-------------------------------------------------------
 void SimDataCollector::setSimStartTime()
 {
-	fdp->getStartTime(&m_iSimStartHour, &m_iSimStartMinute);
+	m_fdp->getStartTime(&m_iSimStartHour, &m_iSimStartMinute);
 }
 
 //-------------------------------------------------------
@@ -178,7 +170,7 @@ void SimDataCollector::setAllCityData()
 	{
 		tempCity = new City();
 
-		cdp->getCityData(name, state, symbol, &latitude, &longitude); // Get a single city's data
+		m_cdp->getCityData(name, state, symbol, &latitude, &longitude); // Get a single city's data
 
 		// Set all of the city's data
 		tempCity->setName(name);
@@ -215,7 +207,7 @@ void SimDataCollector::setAllAircraftData()
 	{
 		tempAircraft = new Aircraft();
 
-		fdp->getAircraftData(make, description, &rateOfClimb, &wingspan, &fuselageLength, &cruiseSpeed, &cruiseAltitude);
+		m_fdp->getAircraftData(make, description, &rateOfClimb, &wingspan, &fuselageLength, &cruiseSpeed, &cruiseAltitude);
 
 		// Set all of the aircraft data
 		tempAircraft->setMake(make);
@@ -226,7 +218,7 @@ void SimDataCollector::setAllAircraftData()
 		tempAircraft->setCruiseSpeed(cruiseSpeed);
 		tempAircraft->setCruiseAltitude(cruiseAltitude);
 
-		m_vAircrafts.push_back(tempAircraft);
+		m_vSharedAircrafts.push_back(tempAircraft);
 	}
 
 	// Free the memory
@@ -253,7 +245,7 @@ void SimDataCollector::setAllFlightData()
 	{
 		tempFlight = new Flight();
 
-		fdp->getFlightData(airline, planeType, &flightNumber, departureLocation, &departureHour, &departureMinute, destination);
+		m_fdp->getFlightData(airline, planeType, &flightNumber, departureLocation, &departureHour, &departureMinute, destination);
 
 		// Set all of the flight data
 		tempFlight->setAirline(airline);
@@ -280,7 +272,7 @@ void SimDataCollector::setAllFlightData()
 void SimDataCollector::setAllCityDistances()
 {
 	m_pdCityDistances = new double[m_iCityCount * m_iCityCount];
-	cdp->getDistTable(&m_pdCityDistances);
+	m_cdp->getDistTable(&m_pdCityDistances);
 }
 
 //-------------------------------------------------------
@@ -288,7 +280,7 @@ void SimDataCollector::setAllCityDistances()
 //-------------------------------------------------------
 void SimDataCollector::setAllCitySymbols()
 {
-	cdp->getCitySymbolsArray(&m_psCitySymbols);
+	m_cdp->getCitySymbolsArray(&m_psCitySymbols);
 }
 
 //-------------------------------------------------------
@@ -299,8 +291,8 @@ Aircraft* SimDataCollector::getFlightAircraft(char* planeType)
 {
 	for (int i = 0; i < m_iAircraftCount; i++)
 	{
-		if (strcmp(planeType, m_vAircrafts[i]->getMake()) == 0) // Found the requested aircraft
-			return m_vAircrafts[i];
+		if (strcmp(planeType, m_vSharedAircrafts[i]->getMake()) == 0) // Found the requested aircraft
+			return m_vSharedAircrafts[i];
 	}
 
 	return nullptr;

@@ -3,7 +3,7 @@
 // Interface file for the SimDataCollector class.
 //
 // Author: Ryan Lynch
-// Date: March 2021
+// Date: April 2021
 //========================================================
 
 #pragma once
@@ -13,6 +13,8 @@
 #include "Flight.h"
 #include "City.h"
 #include "Aircraft.h"
+#include "AircraftTypes.h"
+#include "AircraftFactory.h"
 #include <vector>
 #include <iomanip>
 #include <iostream>
@@ -24,23 +26,26 @@ class SimDataCollector
 {
 private:
 
-	int m_iInstanceNumber; // Number of instances of this class. Used for singleton design purposes (cannot exceed 1)
 	int m_iSimSpeedMultiplier; // Simulation speed multiplier (1X, 2X, or 3X)
 	int m_iSimStartHour; // Start hour of the simulation
 	int m_iSimStartMinute; // Start minute of the simulation
-	FlightDataParser* fdp; // Pointer to a FlightDataParser object
-	CityDataParser* cdp; // Pointer to a CityDataParser object
+	FlightDataParser* m_fdp; // Pointer to a FlightDataParser object
+	CityDataParser* m_cdp; // Pointer to a CityDataParser object
 	char m_sDataFiles[32]; // Holds the name of the file containing the names of the XML data files
 	char m_sCityDataFileName[32]; // Holds the name of the city data file
 	char m_sFlightDataFileName[32]; // Holds the name of the flight data file
-	fstream* dataFileNamesGetter; // Will point to the file containing the names of the XML data files
-	vector<Aircraft*> m_vAircrafts; // Vector of pointers to all Aircraft objects
+	fstream* m_dataFileNamesGrabber; // Will point to the file containing the names of the XML data files
+	AircraftFactory* m_AircraftFactory; // Points to a specific aircraft factory
+	vector<Aircraft*> m_vSharedAircrafts; // Vector of pointers to all SharedAircraft objects
 	vector<Flight*> m_vFlights; // Vector of pointers to all Flight objects
 	vector<City*> m_vCities; // Vector of pointers to all City objects
 	double* m_pdCityDistances; // Pointer to an array of doubles containing distances from all cities to each other
 	char** m_psCitySymbols; // Pointer to an array of character pointers containing city symbols
 	int m_iCityCount; // The number of cities in the city data file
-	int m_iAircraftCount; // The number of aircraft in the flight data file
+	int m_iAircraftCount; // The number of aircraft in the flight data file (REMOVE)
+	int m_iPAircraftCount; // The number of passenger aircrafts in the flight data file
+	int m_iBAircraftCount; // The number of business aircrafts in the flight data file
+	int m_iSEAircraftCount; // The number of single engine aircrafts in the flight data file
 	int m_iFlightCount; // The number of flights in the flight data file
 
 	SimDataCollector(); // Default constructor (private for singleton design purposes)
@@ -63,7 +68,6 @@ private:
 public:
 
 	~SimDataCollector(); // Destructor
-	int getInstanceNumber(); // Return how many instances of this class there are
 	static SimDataCollector* getInstance(); // Return the instance of a SimDataCollector object. Should always return the same object
 	void initializeData(); // Initialize all data needed for the simulation. Uses the city and flight data parsers
 	int getStartHour(); // Getter for m_iSimStartHour

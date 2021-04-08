@@ -123,23 +123,42 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\Desktop\College\CS 307\Program 2 Example\CityDataParser.cpp" />
+    <ClCompile Include="..\..\..\..\Desktop\College\CS 307\Program 2 Example\FlightDataParser.cpp" />
     <ClCompile Include="Aircraft.cpp" />
+    <ClCompile Include="AircraftFactory.cpp" />
+    <ClCompile Include="AircraftFlyweightFactory.cpp" />
+    <ClCompile Include="BusinessAircraftFactory.cpp" />
     <ClCompile Include="City.cpp" />
-    <ClCompile Include="CityDataParser.cpp" />
     <ClCompile Include="Flight.cpp" />
-    <ClCompile Include="FlightDataParser.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="PassengerAircraftFactory.cpp" />
+    <ClCompile Include="SharedAircraft.cpp" />
+    <ClCompile Include="SharedBusinessAircraftFactory.cpp" />
+    <ClCompile Include="SharedPassengerAircraft.cpp" />
+    <ClCompile Include="SharedSingleEngineAircraft.cpp" />
     <ClCompile Include="SimDataCollector.cpp" />
     <ClCompile Include="Simulation.cpp" />
+    <ClCompile Include="SingleEngineAircraftFactory.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\Desktop\College\CS 307\Program 2 Example\CityDataParser.h" />
+    <ClInclude Include="..\..\..\..\Desktop\College\CS 307\Program 2 Example\FlightDataParser.h" />
     <ClInclude Include="Aircraft.h" />
+    <ClInclude Include="AircraftFactory.h" />
+    <ClInclude Include="AircraftFlyweightFactory.h" />
+    <ClInclude Include="AircraftTypes.h" />
+    <ClInclude Include="BusinessAircraftFactory.h" />
     <ClInclude Include="City.h" />
-    <ClInclude Include="CityDataParser.h" />
     <ClInclude Include="Flight.h" />
-    <ClInclude Include="FlightDataParser.h" />
+    <ClInclude Include="PassengerAircraftFactory.h" />
+    <ClInclude Include="SharedAircraft.h" />
+    <ClInclude Include="SharedBusinessAircraft.h" />
+    <ClInclude Include="SharedPassengerAircraft.h" />
+    <ClInclude Include="SharedSingleEngineAircraft.h" />
     <ClInclude Include="SimDataCollector.h" />
     <ClInclude Include="Simulation.h" />
+    <ClInclude Include="SingleEngineAircraftFactory.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -12,6 +12,9 @@
 		<MAKE>
 			Boeing 747
 		</MAKE>
+		<TYPE>
+			PASSENGERJET
+		</TYPE>
 		<DESCRIPTION>
 			Jumbo Jet
 		</DESCRIPTION>
@@ -35,6 +38,9 @@
 		<MAKE>
 			Boeing 727
 		</MAKE>
+		<TYPE>
+			PASSENGERJET
+		</TYPE>
 		<DESCRIPTION>
 			Passenger Jet
 		</DESCRIPTION>
@@ -58,6 +64,9 @@
 		<MAKE>
 			MD DC-9
 		</MAKE>
+		<TYPE>
+			PASSENGERJET
+		</TYPE>
 		<DESCRIPTION>
 			Passenger Jet
 		</DESCRIPTION>
@@ -81,6 +90,9 @@
 		<MAKE>
 			Gulfstream 150
 		</MAKE>
+		<TYPE>
+			BUSINESSJET
+		</TYPE>
 		<DESCRIPTION>
 			Business Jet
 		</DESCRIPTION>
@@ -102,8 +114,63 @@
 	</PLANE>
 	<PLANE>
 		<MAKE>
+			Cessna Citation Mustang
+		</MAKE>
+		<TYPE>
+			BUSINESSJET
+		</TYPE>
+		<DESCRIPTION>
+			Business Jet
+		</DESCRIPTION>
+		<RATEOFCLIMB>
+			3010
+		</RATEOFCLIMB>
+		<WINGSPAN>
+			43
+		</WINGSPAN>
+		<LENGTH>
+			40
+		</LENGTH>
+		<CRUISESPEED>
+			340
+		</CRUISESPEED>
+		<CRUISEALTITUDE>
+			41000
+		</CRUISEALTITUDE>
+	</PLANE>
+	<PLANE>
+		<MAKE>
+			Cessna Citation X
+		</MAKE>
+		<TYPE>
+			BUSINESSJET
+		</TYPE>
+		<DESCRIPTION>
+			Business Jet
+		</DESCRIPTION>
+		<RATEOFCLIMB>
+			3650
+		</RATEOFCLIMB>
+		<WINGSPAN>
+			63
+		</WINGSPAN>
+		<LENGTH>
+			72
+		</LENGTH>
+		<CRUISESPEED>
+			525
+		</CRUISESPEED>
+		<CRUISEALTITUDE>
+			51000
+		</CRUISEALTITUDE>
+	</PLANE>
+	<PLANE>
+		<MAKE>
 			Piper Cherokee 180-C
 		</MAKE>
+		<TYPE>
+			SINGLEENGINE
+		</TYPE>
 		<DESCRIPTION>
 			Single-engine private
 		</DESCRIPTION>
@@ -127,6 +194,9 @@
 		<MAKE>
 			Cessna 172
 		</MAKE>
+		<TYPE>
+			SINGLEENGINE
+		</TYPE>
 		<DESCRIPTION>
 			Single-engine private
 		</DESCRIPTION>
@@ -146,15 +216,41 @@
 			7500
 		</CRUISEALTITUDE>
 	</PLANE>
+	<PLANE>
+		<MAKE>
+			Cessna Skyhawk
+		</MAKE>
+		<TYPE>
+			SINGLEENGINE
+		</TYPE>
+		<DESCRIPTION>
+			Single-engine private
+		</DESCRIPTION>
+		<RATEOFCLIMB>
+			730
+		</RATEOFCLIMB>
+		<WINGSPAN>
+			36
+		</WINGSPAN>
+		<LENGTH>
+			27
+		</LENGTH>
+		<CRUISESPEED>
+			122
+		</CRUISESPEED>
+		<CRUISEALTITUDE>
+			14000
+		</CRUISEALTITUDE>
+	</PLANE>
 </PLANES>
 <FLIGHTS>
 	<FLIGHT>
 		<AIRLINE>
 			Delta
 		</AIRLINE>
-		<PLANETYPE>
+		<PLANEMAKE>
 			Boeing 747
-		</PLANETYPE>
+		</PLANEMAKE>
 		<FLIGHTNUMBER>
 			2449
 		</FLIGHTNUMBER>
@@ -177,9 +273,9 @@
 		<AIRLINE>
 			Delta
 		</AIRLINE>
-		<PLANETYPE>
+		<PLANEMAKE>
 			Boeing 727
-		</PLANETYPE>
+		</PLANEMAKE>
 		<FLIGHTNUMBER>
 			2165
 		</FLIGHTNUMBER>
@@ -202,9 +298,9 @@
 		<AIRLINE>
 			Delta
 		</AIRLINE>
-		<PLANETYPE>
+		<PLANEMAKE>
 			MD DC-9
-		</PLANETYPE>
+		</PLANEMAKE>
 		<FLIGHTNUMBER>
 			2536
 		</FLIGHTNUMBER>
@@ -227,9 +323,9 @@
 		<AIRLINE>
 			Delta
 		</AIRLINE>
-		<PLANETYPE>
+		<PLANEMAKE>
 			MD DC-9
-		</PLANETYPE>
+		</PLANEMAKE>
 		<FLIGHTNUMBER>
 			2763
 		</FLIGHTNUMBER>
@@ -252,9 +348,9 @@
 		<AIRLINE>
 			United
 		</AIRLINE>
-		<PLANETYPE>
+		<PLANEMAKE>
 			Boeing 747
-		</PLANETYPE>
+		</PLANEMAKE>
 		<FLIGHTNUMBER>
 			3580
 		</FLIGHTNUMBER>
@@ -277,9 +373,9 @@
 		<AIRLINE>
 			United
 		</AIRLINE>
-		<PLANETYPE>
+		<PLANEMAKE>
 			Boeing 727
-		</PLANETYPE>
+		</PLANEMAKE>
 		<FLIGHTNUMBER>
 			3152
 		</FLIGHTNUMBER>
@@ -302,9 +398,9 @@
 		<AIRLINE>
 			United
 		</AIRLINE>
-		<PLANETYPE>
+		<PLANEMAKE>
 			Boeing 727
-		</PLANETYPE>
+		</PLANEMAKE>
 		<FLIGHTNUMBER>
 			3658
 		</FLIGHTNUMBER>
@@ -327,9 +423,9 @@
 		<AIRLINE>
 			United
 		</AIRLINE>
-		<PLANETYPE>
+		<PLANEMAKE>
 			MD DC-9
-		</PLANETYPE>
+		</PLANEMAKE>
 		<FLIGHTNUMBER>
 			3745
 		</FLIGHTNUMBER>
@@ -352,9 +448,9 @@
 		<AIRLINE>
 			US Airways
 		</AIRLINE>
-		<PLANETYPE>
+		<PLANEMAKE>
 			Boeing 747
-		</PLANETYPE>
+		</PLANEMAKE>
 		<FLIGHTNUMBER>
 			4523
 		</FLIGHTNUMBER>
@@ -377,9 +473,9 @@
 		<AIRLINE>
 			US Airways
 		</AIRLINE>
-		<PLANETYPE>
+		<PLANEMAKE>
 			Boeing 727
-		</PLANETYPE>
+		</PLANEMAKE>
 		<FLIGHTNUMBER>
 			4687
 		</FLIGHTNUMBER>
@@ -402,9 +498,9 @@
 		<AIRLINE>
 			US Airways
 		</AIRLINE>
-		<PLANETYPE>
+		<PLANEMAKE>
 			MD DC-9
-		</PLANETYPE>
+		</PLANEMAKE>
 		<FLIGHTNUMBER>
 			4365
 		</FLIGHTNUMBER>
@@ -427,9 +523,9 @@
 		<AIRLINE>
 			US Airways
 		</AIRLINE>
-		<PLANETYPE>
+		<PLANEMAKE>
 			MD DC-9
-		</PLANETYPE>
+		</PLANEMAKE>
 		<FLIGHTNUMBER>
 			4216
 		</FLIGHTNUMBER>
@@ -450,11 +546,36 @@
 	</FLIGHT>
 	<FLIGHT>
 		<AIRLINE>
+			Private
+		</AIRLINE>
+		<PLANEMAKE>
+			Cessna Citation Mustang
+		</PLANEMAKE>
+		<FLIGHTNUMBER>
+			9376
+		</FLIGHTNUMBER>
+		<DEPARTSFROM>
+			MOB
+		</DEPARTSFROM>
+		<DEPARTURETIME>
+			<HOUR>
+				10
+			</HOUR>
+			<MINUTE>
+				45
+			</MINUTE>
+		</DEPARTURETIME>
+		<DESTINATION>
+			NYK
+		</DESTINATION>
+	</FLIGHT>
+	<FLIGHT>
+		<AIRLINE>
 			American
 		</AIRLINE>
-		<PLANETYPE>
+		<PLANEMAKE>
 			Boeing 747
-		</PLANETYPE>
+		</PLANEMAKE>
 		<FLIGHTNUMBER>
 			5298
 		</FLIGHTNUMBER>
@@ -477,9 +598,9 @@
 		<AIRLINE>
 			American
 		</AIRLINE>
-		<PLANETYPE>
+		<PLANEMAKE>
 			Boeing 727
-		</PLANETYPE>
+		</PLANEMAKE>
 		<FLIGHTNUMBER>
 			5341
 		</FLIGHTNUMBER>
@@ -502,9 +623,9 @@
 		<AIRLINE>
 			American
 		</AIRLINE>
-		<PLANETYPE>
+		<PLANEMAKE>
 			Boeing 727
-		</PLANETYPE>
+		</PLANEMAKE>
 		<FLIGHTNUMBER>
 			5387
 		</FLIGHTNUMBER>
@@ -527,9 +648,9 @@
 		<AIRLINE>
 			American
 		</AIRLINE>
-		<PLANETYPE>
+		<PLANEMAKE>
 			MD DC-9
-		</PLANETYPE>
+		</PLANEMAKE>
 		<FLIGHTNUMBER>
 			5923
 		</FLIGHTNUMBER>
@@ -552,9 +673,9 @@
 		<AIRLINE>
 			Private
 		</AIRLINE>
-		<PLANETYPE>
+		<PLANEMAKE>
 			Gulfstream 150
-		</PLANETYPE>
+		</PLANEMAKE>
 		<FLIGHTNUMBER>
 			9142
 		</FLIGHTNUMBER>
@@ -577,9 +698,9 @@
 		<AIRLINE>
 			Private
 		</AIRLINE>
-		<PLANETYPE>
+		<PLANEMAKE>
 			Gulfstream 150
-		</PLANETYPE>
+		</PLANEMAKE>
 		<FLIGHTNUMBER>
 			9345
 		</FLIGHTNUMBER>
@@ -602,9 +723,9 @@
 		<AIRLINE>
 			Private
 		</AIRLINE>
-		<PLANETYPE>
+		<PLANEMAKE>
 			Piper Cherokee 180-C
-		</PLANETYPE>
+		</PLANEMAKE>
 		<FLIGHTNUMBER>
 			8264
 		</FLIGHTNUMBER>
@@ -627,9 +748,9 @@
 		<AIRLINE>
 			Private
 		</AIRLINE>
-		<PLANETYPE>
+		<PLANEMAKE>
 			Piper Cherokee 180-C
-		</PLANETYPE>
+		</PLANEMAKE>
 		<FLIGHTNUMBER>
 			8621
 		</FLIGHTNUMBER>
@@ -652,9 +773,9 @@
 		<AIRLINE>
 			Private
 		</AIRLINE>
-		<PLANETYPE>
+		<PLANEMAKE>
 			Cessna 172
-		</PLANETYPE>
+		</PLANEMAKE>
 		<FLIGHTNUMBER>
 			8369
 		</FLIGHTNUMBER>
@@ -677,9 +798,9 @@
 		<AIRLINE>
 			Private
 		</AIRLINE>
-		<PLANETYPE>
+		<PLANEMAKE>
 			Cessna 172
-		</PLANETYPE>
+		</PLANEMAKE>
 		<FLIGHTNUMBER>
 			8216
 		</FLIGHTNUMBER>
@@ -696,6 +817,56 @@
 		</DEPARTURETIME>
 		<DESTINATION>
 			MIA
+		</DESTINATION>
+	</FLIGHT>
+	<FLIGHT>
+		<AIRLINE>
+			Private
+		</AIRLINE>
+		<PLANEMAKE>
+			Cessna Citation X
+		</PLANEMAKE>
+		<FLIGHTNUMBER>
+			9381
+		</FLIGHTNUMBER>
+		<DEPARTSFROM>
+			ORL
+		</DEPARTSFROM>
+		<DEPARTURETIME>
+			<HOUR>
+				12
+			</HOUR>
+			<MINUTE>
+				00
+			</MINUTE>
+		</DEPARTURETIME>
+		<DESTINATION>
+			NYK
+		</DESTINATION>
+	</FLIGHT>
+	<FLIGHT>
+		<AIRLINE>
+			Private
+		</AIRLINE>
+		<PLANEMAKE>
+			Cessna Skyhawk
+		</PLANEMAKE>
+		<FLIGHTNUMBER>
+			9395
+		</FLIGHTNUMBER>
+		<DEPARTSFROM>
+			MOB
+		</DEPARTSFROM>
+		<DEPARTURETIME>
+			<HOUR>
+				13
+			</HOUR>
+			<MINUTE>
+				30
+			</MINUTE>
+		</DEPARTURETIME>
+		<DESTINATION>
+			HSV
 		</DESTINATION>
 	</FLIGHT>
 </FLIGHTS>
