@@ -12,6 +12,8 @@
 
 #pragma once
 
+#include "Aircraft.h"
+
 using namespace std;
 
 class Flight
@@ -19,7 +21,7 @@ class Flight
 private:
 
 	char m_sAirline[32]; // The airline
-	char m_sPlaneType[32]; // The aircraft type
+	Aircraft* m_ac; // The Aircraft object associated with the Flight object
 	int m_iFlightNumber; // The flight number
 	char m_sDepartureLocation[4]; // The departure city symbol
 	int m_iDepartureHour; // The departure hour
@@ -42,12 +44,7 @@ private:
 	char m_sDepStateName[32]; // The full name of the departure state
 	char m_sDestCityName[32]; // The full name of the departure city
 	char m_sDestStateName[32]; // The full name of the destination state
-	double m_dCurrentAltitude; // The current altitude of the plane
-	double m_dCurrentLatitude; // The current latitude of the plane
-	double m_dCurrentLongitude; // The current longitude of the plane
-	double m_dCruiseAltitude; // The maximum altitude in feet that the plane will reach
-	double m_dRateOfClimb; // The rate of climb of the plane in feet/minute
-	double m_dCurrentSpeed; // The current speed of the plane in miles per hour (it's just the cruise speed)
+	double m_dCurSpeed; // The current speed the flight is traveling at (constant in this simulation)
 	double m_dTripTime; // The total time the flight will take in hours
 	double m_dTotalDistance; // The total distance (in miles) the flight spans
 	double m_dDistanceFromStart; // The distance (in miles) the flight is from the departure city
@@ -60,7 +57,7 @@ public:
 	Flight();
 	~Flight();
 	void setAirline(char* airline);
-	void setPlaneType(char* planeType);
+	void setAircraft(Aircraft* ac);
 	void setFlightNumber(int flightNumber);
 	void setDepartureLocation(char* depLocation);
 	void setDepartureHour(int depHour);
@@ -82,11 +79,6 @@ public:
 	void setDepStateName(char* state);
 	void setDestCityName(char* city);
 	void setDestStateName(char* state);
-	void setCurrentAltitude(double altitude);
-	void setCurrentLatitude(double latitude);
-	void setCurrentLongitude(double longitude);
-	void setCruiseAltitude(double altitude);
-	void setRateOfClimb(double roc);
 	void setCurrentSpeed(double speed);
 	void setTripTime(double tripTime);
 	void setTotalDistance(double distance);
@@ -95,7 +87,7 @@ public:
 	void setCompleteFlag(bool val);
 	void setOngoingFlag(bool val);
 	char* getAirline();
-	char* getPlaneType();
+	Aircraft* getAircraft();
 	int getFlightNumber();
 	char* getDepartureLocation();
 	int getDepartureHour();
@@ -117,11 +109,6 @@ public:
 	char* getDepStateName();
 	char* getDestCityName();
 	char* getDestStateName();
-	double getCurrentAltitude();
-	double getCurrentLatitude();
-	double getCurrentLongitude();
-	double getCruiseAltitude();
-	double getRateOfClimb();
 	double getCurrentSpeed();
 	double getTripTime();
 	double getTotalDistance();
@@ -129,10 +116,10 @@ public:
 	double getDistanceToDestination();
 	bool getCompleteFlag();
 	bool getOngoingFlag();
-	void updateLatitude(); // Update an ongoing flight's latitude (happens every simulation second the plane is flying)
-	void updateLongitude(); // Update an ongoing flight's longitude (happens every simulation second the plane is flying)
+	double updateLatitude(); // Update an ongoing flight's latitude (happens every simulation second the plane is flying)
+	double updateLongitude(); // Update an ongoing flight's longitude (happens every simulation second the plane is flying)
 	void updateDistanceFromCities(); // Update an ongoing flight's distance (in miles) from the departure city and distance to the destination city
-	void updateAltitude(); // Update an ongoing flight's altitude (happens every simulation second the plane is flying)
+	double updateAltitude(); // Update an ongoing flight's altitude (happens every simulation second the plane is flying)
 	void calculateAltitudeChangeTimes(); // Calculates when the flight will reach cruise altitude and when the flight will need to start descending
 
 	enum Status{ COMPLETE, TAKEOFF, ONGOING, ARRIVED }; // Statuses for flights

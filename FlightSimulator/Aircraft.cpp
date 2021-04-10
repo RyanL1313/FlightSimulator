@@ -6,10 +6,7 @@
 // Date: April 2021
 //========================================================
 
-#pragma warning(disable : 4996)
-
 #include "Aircraft.h"
-#include <string.h>
 
 using namespace std;
 
@@ -20,75 +17,45 @@ Aircraft::Aircraft()
 
 Aircraft::~Aircraft()
 {
-
+	delete m_sa;
 }
 
-void Aircraft::setMake(char* make)
+SharedAircraft* Aircraft::getSharedAircraft()
 {
-	strcpy(m_sMake, make);
+	return m_sa;
 }
 
-void Aircraft::setDescription(char* description)
+double Aircraft::getCurLatitude()
 {
-	strcpy(m_sDescription, description);
+	return m_dCurLatitude;
 }
 
-void Aircraft::setRateOfClimb(double rateOfClimb)
+double Aircraft::getCurLongitude()
 {
-	m_dRateOfClimb = rateOfClimb;
+	return m_dCurLongitude;
 }
 
-void Aircraft::setWingspan(double wingspan)
+double Aircraft::getCurAltitude()
 {
-	m_dWingspan = wingspan;
+	return m_dCurAltitude;
 }
 
-void Aircraft::setFuselageLength(double fuselageLength)
+void Aircraft::setSharedAircraft(SharedAircraft* sa)
 {
-	m_dFuselageLength = fuselageLength;
+	m_sa = sa;
 }
 
-void Aircraft::setCruiseSpeed(double cruiseSpeed)
+void Aircraft::setCurLatitude(double lat)
 {
-	m_dCruiseSpeed = cruiseSpeed;
+	m_dCurLatitude = lat;
 }
 
-void Aircraft::setCruiseAltitude(double cruiseAltitude)
+void Aircraft::setCurLongitude(double lon)
 {
-	m_dCruiseAltitude = cruiseAltitude;
+	m_dCurLongitude = lon;
 }
 
-char* Aircraft::getMake()
+void Aircraft::setCurAltitude(double alt)
 {
-	return m_sMake;
-}
-
-char* Aircraft::getDescription()
-{
-	return m_sDescription;
-}
-
-double Aircraft::getRateOfClimb()
-{
-	return m_dRateOfClimb;
-}
-
-double Aircraft::getWingspan()
-{
-	return m_dWingspan;
-}
-
-double Aircraft::getFuselageLength()
-{
-	return m_dFuselageLength;
-}
-
-double Aircraft::getCruiseSpeed()
-{
-	return m_dCruiseSpeed;
-}
-
-double Aircraft::getCruiseAltitude()
-{
-	return m_dCruiseAltitude;
+	m_dCurAltitude = alt;
 }

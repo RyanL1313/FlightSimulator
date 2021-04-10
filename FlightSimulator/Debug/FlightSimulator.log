@@ -1,21 +1,14 @@
-﻿  CityDataParser.cpp
-  FlightDataParser.cpp
-  Aircraft.cpp
+﻿  Aircraft.cpp
   AircraftFactory.cpp
   AircraftFlyweightFactory.cpp
+c:\users\ryan\source\repos\flightsimulator\flightsimulator\aircraftflyweightfactory.cpp(10): warning C4018: '<': signed/unsigned mismatch
+c:\users\ryan\source\repos\flightsimulator\flightsimulator\aircraftflyweightfactory.cpp(31): warning C4018: '<': signed/unsigned mismatch
+c:\users\ryan\source\repos\flightsimulator\flightsimulator\aircraftflyweightfactory.cpp(44): warning C4018: '<': signed/unsigned mismatch
   BusinessAircraftFactory.cpp
-  City.cpp
-  Flight.cpp
-c:\users\ryan\source\repos\flightsimulator\flightsimulator\flight.cpp(88): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-  main.cpp
   PassengerAircraftFactory.cpp
-  SharedAircraft.cpp
-  SharedBusinessAircraftFactory.cpp
-  SharedPassengerAircraft.cpp
-  SharedSingleEngineAircraft.cpp
   SimDataCollector.cpp
-c:\users\ryan\source\repos\flightsimulator\flightsimulator\simdatacollector.cpp(208): error C2660: 'FlightDataParser::getAircraftData': function does not take 7 arguments
-  c:\users\ryan\source\repos\flightsimulator\flightsimulator\flightdataparser.h(37): note: see declaration of 'FlightDataParser::getAircraftData'
   Simulation.cpp
   SingleEngineAircraftFactory.cpp
+  main.cpp
   Generating Code...
+  FlightSimulator.vcxproj -> C:\Users\Ryan\source\repos\FlightSimulator\Debug\FlightSimulator.exe

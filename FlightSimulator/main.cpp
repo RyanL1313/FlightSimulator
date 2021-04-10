@@ -53,7 +53,7 @@ int main()
 void printIntroduction()
 {
 	cout << "=======================================================================" << endl;
-	cout << "|        Flight Simulator - CS 307-01 Programming Assignment 1         |" << endl;
+	cout << "|        Flight Simulator - CS 307-01 Programming Assignment 2         |" << endl;
 	cout << "|                         By: Ryan Lynch                               |" << endl;
 	cout << "=======================================================================" << endl << endl;
 }

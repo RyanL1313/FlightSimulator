@@ -15,6 +15,10 @@
 #include "Aircraft.h"
 #include "AircraftTypes.h"
 #include "AircraftFactory.h"
+#include "BusinessAircraftFactory.h"
+#include "PassengerAircraftFactory.h"
+#include "SingleEngineAircraftFactory.h"
+#include "SharedAircraft.h"
 #include <vector>
 #include <iomanip>
 #include <iostream>
@@ -36,7 +40,8 @@ private:
 	char m_sFlightDataFileName[32]; // Holds the name of the flight data file
 	fstream* m_dataFileNamesGrabber; // Will point to the file containing the names of the XML data files
 	AircraftFactory* m_AircraftFactory; // Points to a specific aircraft factory
-	vector<Aircraft*> m_vSharedAircrafts; // Vector of pointers to all SharedAircraft objects
+	AircraftFlyweightFactory* m_aff; // Points to the singleton AircraftFlyweightFactory object
+	vector<SharedAircraft*> m_vSharedAircrafts; // Vector of pointers to all SharedAircraft objects
 	vector<Flight*> m_vFlights; // Vector of pointers to all Flight objects
 	vector<City*> m_vCities; // Vector of pointers to all City objects
 	double* m_pdCityDistances; // Pointer to an array of doubles containing distances from all cities to each other
@@ -57,7 +62,6 @@ private:
 	void setAllFlightData(); // Sets the data about all of the flights
 	void setAllCityDistances(); // Sets the distances between each city
 	void setAllCitySymbols(); // Sets all city airport symbols
-	Aircraft* getFlightAircraft(char* planeType); // Returns a pointer to the Aircraft object associated with a flight's plane type
 	City* getFlightCity(char* citySymbol); // Returns a pointer to a city object (either departure city or destination) associated with a certain city symbol
 	double calculateTripTime(double totalDistance, double cruiseSpeed); // Calculates how long a flight will take (in hours)
 	double calculateTotalDistance(char* depCitySymbol, char* destCitySymbol); // Calculates the total distance between two cities using m_pdCityDistances

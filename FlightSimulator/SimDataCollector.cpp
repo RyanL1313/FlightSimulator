@@ -78,6 +78,7 @@ void SimDataCollector::initializeData()
 	m_cdp = m_cdp->getInstance(); // Set pointer to the CityDataParser object
 	m_fdp = m_fdp->getInstance(); // Set pointer to the FlightDataParser object
 	setDataFileNames(); // Set the char arrays containing the XML data file names
+	m_aff = AircraftFlyweightFactory::getInstance(); // Set the pointer to the singleton AircraftFlyweightFactory instance
 
 	// Initialize parser data
 	m_cdp->InitCityData(m_sCityDataFileName);
@@ -189,42 +190,37 @@ void SimDataCollector::setAllCityData()
 }
 
 //-------------------------------------------------------
-// Creates all Aircraft objects required for the simulation.
+// Uses the Abstract Factory design pattern to initialize
+// the different types of SharedAircraft objects. 
+//
+// The concrete factories will store the SharedAircraft
+// objects in the AircraftFlyweightFactory object's vector
+// of SharedAircraft instances.
 //-------------------------------------------------------
 void SimDataCollector::setAllAircraftData()
 {
-	// Data to be populated for each Aircraft object
-	char make[32];
-	char description[32];
-	double rateOfClimb;
-	double wingspan;
-	double fuselageLength;
-	double cruiseSpeed;
-	double cruiseAltitude;
-	Aircraft* tempAircraft;
+	// First, we will add all SharedAircraft objects to m_vSharedAircrafts
 
-	for (int i = 0; i < m_iAircraftCount; i++)
+	// Add all SharedPassengerAircraft objects
+	m_AircraftFactory = PassengerAircraftFactory::getInstance();
+	for (int i = 0; i < m_iPAircraftCount; i++)
 	{
-		tempAircraft = new Aircraft();
-
-		m_fdp->getAircraftData(make, description, &rateOfClimb, &wingspan, &fuselageLength, &cruiseSpeed, &cruiseAltitude);
-
-		// Set all of the aircraft data
-		tempAircraft->setMake(make);
-		tempAircraft->setDescription(description);
-		tempAircraft->setRateOfClimb(rateOfClimb);
-		tempAircraft->setWingspan(wingspan);
-		tempAircraft->setFuselageLength(fuselageLength);
-		tempAircraft->setCruiseSpeed(cruiseSpeed);
-		tempAircraft->setCruiseAltitude(cruiseAltitude);
-
-		m_vSharedAircrafts.push_back(tempAircraft);
+		m_AircraftFactory->createSharedAircraft(m_fdp); // Creates a SharedPassengerAircraft object and adds it to the AircraftFlyweightFactory
 	}
 
-	// Free the memory
-	tempAircraft = new Aircraft();
-	delete tempAircraft;
-	tempAircraft = nullptr;
+	// Add all SharedBusinessAircraft objects
+	m_AircraftFactory = BusinessAircraftFactory::getInstance();
+	for (int i = 0; i < m_iBAircraftCount; i++)
+	{
+		m_AircraftFactory->createSharedAircraft(m_fdp); // Creates a SharedBusinessAircraft object and adds it to the AircraftFlyweightFactory
+	}
+
+	// Add all SharedSingleEngineAircraft objects
+	m_AircraftFactory = SingleEngineAircraftFactory::getInstance();
+	for (int i = 0; i < m_iSEAircraftCount; i++)
+	{
+		m_AircraftFactory->createSharedAircraft(m_fdp); // Creates a SharedSingleEngineAircraft object and adds it to the AircraftFlyweightFactory
+	}
 }
 
 //--------------------------------------------------------
@@ -233,23 +229,30 @@ void SimDataCollector::setAllAircraftData()
 void SimDataCollector::setAllFlightData()
 {
 	char airline[32];
-	char planeType[32];
+	char planeMake[32];
 	int flightNumber;
 	char departureLocation[4];
 	int departureHour;
 	int departureMinute;
 	char destination[4];
 	Flight* tempFlight;
+	SharedAircraft* tempSharedAircraft;
+	Aircraft* tempAircraft;
 
 	for (int i = 0; i < m_iFlightCount; i++)
 	{
 		tempFlight = new Flight();
+		tempAircraft = new Aircraft();
 
-		m_fdp->getFlightData(airline, planeType, &flightNumber, departureLocation, &departureHour, &departureMinute, destination);
+		m_fdp->getFlightData(airline, planeMake, &flightNumber, departureLocation, &departureHour, &departureMinute, destination);
 
 		// Set all of the flight data
 		tempFlight->setAirline(airline);
-		tempFlight->setPlaneType(planeType);
+
+		tempSharedAircraft = m_aff->getSharedAircraft(planeMake); // Get the SharedAircraft instance from the flyweight factory corresponding to the make
+		tempAircraft->setSharedAircraft(tempSharedAircraft); // Make the flight's Aircraft object have a pointer to the correct SharedAircraft object
+		tempFlight->setAircraft(tempAircraft); // Set the flight's Aircraft object
+
 		tempFlight->setFlightNumber(flightNumber);
 		tempFlight->setDepartureLocation(departureLocation);
 		tempFlight->setDepartureHour(departureHour);
@@ -258,12 +261,13 @@ void SimDataCollector::setAllFlightData()
 		tempFlight->setDestination(destination);
 
 		m_vFlights.push_back(tempFlight);
-	}
 
-	// Free the memory
-	tempFlight = new Flight();
-	delete tempFlight;
-	tempFlight = nullptr;
+		// Free the memory
+		tempFlight = new Flight();
+		tempAircraft = new Aircraft();
+		delete tempFlight, tempAircraft;
+		tempFlight, tempAircraft = nullptr;
+	}
 }
 
 //-------------------------------------------------------
@@ -284,21 +288,6 @@ void SimDataCollector::setAllCitySymbols()
 }
 
 //-------------------------------------------------------
-// Gets the aircraft associated with a flight's plane
-// type.
-//-------------------------------------------------------
-Aircraft* SimDataCollector::getFlightAircraft(char* planeType)
-{
-	for (int i = 0; i < m_iAircraftCount; i++)
-	{
-		if (strcmp(planeType, m_vSharedAircrafts[i]->getMake()) == 0) // Found the requested aircraft
-			return m_vSharedAircrafts[i];
-	}
-
-	return nullptr;
-}
-
-//-------------------------------------------------------
 // Gets the city associated with a flight (either
 // departure city or destination).
 //-------------------------------------------------------
@@ -310,7 +299,7 @@ City* SimDataCollector::getFlightCity(char* citySymbol)
 			return m_vCities[i];
 	}
 
-	return nullptr;
+	return NULL;
 }
 
 //-------------------------------------------------------
@@ -425,7 +414,8 @@ int SimDataCollector::updateFlight(int index, int currentHour, int currentMinute
 {
 	int flightStatus = -1; // The status of the flight returned from this function
 	Flight* theFlight = m_vFlights[index]; // A pointer to the flight located at the requested index
-	Aircraft* thePlane = getFlightAircraft(theFlight->getPlaneType()); // Get a pointer to the Aircraft object for this flight
+	Aircraft* thePlane = theFlight->getAircraft(); // Get a pointer to the Aircraft object for this flight
+	SharedAircraft* theSharedPlane = thePlane->getSharedAircraft(); // Get a pointer to the SharedAircraft object for the aircraft
 	City* depCity = getFlightCity(theFlight->getDepartureLocation()); // Get a pointer to the City object corresponding to the departure city
 	City* destCity = getFlightCity(theFlight->getDestination()); // Get a pointer to the City object corresponding to the destination city
 
@@ -441,13 +431,11 @@ int SimDataCollector::updateFlight(int index, int currentHour, int currentMinute
 			{
 				theFlight->setOngoingFlag(true); // Flag the flight as ongoing
 
-				theFlight->setCurrentAltitude(0); // Initialize the current altitude to 0
-				theFlight->setCurrentSpeed(thePlane->getCruiseSpeed()); // Set the current speed to the cruise speed of this aircraft type
-				theFlight->setRateOfClimb(thePlane->getRateOfClimb()); // Se the flight's rate of climb to the aircraft's rate of climb
-				theFlight->setCruiseAltitude(thePlane->getCruiseAltitude()); // Set the flight's cruise altitude to the aircraft's cruise altitude
+				thePlane->setCurAltitude(0); // Initialize the current altitude to 0
+				theFlight->setCurrentSpeed(theSharedPlane->getCruiseSpeed()); // Set the current speed to the cruise speed of this aircraft type
 
-				theFlight->setCurrentLongitude(depCity->getLongitude()); // Initialize the longitude to the departure city's longitude
-				theFlight->setCurrentLatitude(depCity->getLatitude()); // Initialize the latitude to the departure city's latitude
+				thePlane->setCurLongitude(depCity->getLongitude()); // Initialize the longitude to the departure city's longitude
+				thePlane->setCurLatitude(depCity->getLatitude()); // Initialize the latitude to the departure city's latitude
 				theFlight->setDepCityLongitude(depCity->getLongitude()); // Set departure city longitude
 				theFlight->setDepCityLatitude(depCity->getLatitude()); // Set departure city latitude
 				theFlight->setDestCityLongitude(destCity->getLongitude()); // Set destination city longitude
@@ -459,7 +447,7 @@ int SimDataCollector::updateFlight(int index, int currentHour, int currentMinute
 				theFlight->setDestStateName(destCity->getState()); // Set full departure city name
 
 				theFlight->setTotalDistance(calculateTotalDistance(depCity->getSymbol(), destCity->getSymbol())); // Set the distance between the departure city and destination
-				theFlight->setTripTime(calculateTripTime(theFlight->getTotalDistance(), thePlane->getCruiseSpeed())); // Set the flight duration in hours
+				theFlight->setTripTime(calculateTripTime(theFlight->getTotalDistance(), theSharedPlane->getCruiseSpeed())); // Set the flight duration in hours
 				theFlight->setDistanceFromStart(0); // Set the flight's distance from its departure city (initially 0)
 				theFlight->setDistanceToDestination(theFlight->getTotalDistance()); // Initialize the distance to the destination city to the total distance between the cities
 
@@ -480,11 +468,11 @@ int SimDataCollector::updateFlight(int index, int currentHour, int currentMinute
 				theFlight->setOngoingFlag(false); // No longer ongoing
 				theFlight->setCompleteFlag(true); // Set flight complete flag
 
-				theFlight->setCurrentAltitude(0); // Set altitude to 0
+				thePlane->setCurAltitude(0); // Set altitude to 0
 				theFlight->setCurrentSpeed(0); // Set current speed to 0
 
-				theFlight->setCurrentLongitude(destCity->getLongitude()); // Initialize the latitude to the destination city's longitude
-				theFlight->setCurrentLatitude(destCity->getLatitude()); // Initialize the latitude to the destination city's latitude
+				thePlane->setCurLongitude(destCity->getLongitude()); // Initialize the latitude to the destination city's longitude
+				thePlane->setCurLatitude(destCity->getLatitude()); // Initialize the latitude to the destination city's latitude
 
 				theFlight->setDistanceFromStart(theFlight->getTotalDistance()); // Distance from start is the total distance traveled in the flight
 				theFlight->setDistanceToDestination(0); // Arrived at the destination
@@ -494,13 +482,13 @@ int SimDataCollector::updateFlight(int index, int currentHour, int currentMinute
 			else // This flight is still ongoing
 			{
 				// Calculate current latitude
-				theFlight->updateLatitude();
+				thePlane->setCurLatitude(theFlight->updateLatitude());
 				// Calculate current longitude
-				theFlight->updateLongitude();
+				thePlane->setCurLongitude(theFlight->updateLongitude());
 				// Calculate distances
 				theFlight->updateDistanceFromCities();
 				// Calculate current altitude
-				theFlight->updateAltitude();
+				thePlane->setCurAltitude(theFlight->updateAltitude());
 
 				flightStatus = Flight::ONGOING;
 			}
@@ -515,8 +503,9 @@ int SimDataCollector::updateFlight(int index, int currentHour, int currentMinute
 	depCity = new City();
 	destCity = new City();
 	thePlane = new Aircraft();
-	delete theFlight, depCity, destCity, thePlane;
-	theFlight, depCity, destCity, thePlane = nullptr;
+	theSharedPlane = new SharedAircraft();
+	delete theFlight, depCity, destCity, thePlane, theSharedPlane;
+	theFlight, depCity, destCity, thePlane, theSharedPlane = nullptr;
 
 	return flightStatus; // Return the status of the flight to determine if any reports need to be generated
 }
@@ -564,16 +553,16 @@ void SimDataCollector::displayScheduledReport(int currentHour, int currentMinute
 	{
 		if (m_vFlights[i]->getOngoingFlag() == true) // Only print out the status of ongoing flights
 		{
-			cout << m_vFlights[i]->getAirline() << " Flight " << m_vFlights[i]->getFlightNumber() << " - " << m_vFlights[i]->getPlaneType() << endl;
+			cout << m_vFlights[i]->getAirline() << " Flight " << m_vFlights[i]->getFlightNumber() << " - " << m_vFlights[i]->getAircraft()->getSharedAircraft()->getMake() << endl;
 			cout << "\tDeparts: " << m_vFlights[i]->getDepartureLocation() << " (" << m_vFlights[i]->getDepCityLatitude() << ", " << m_vFlights[i]->getDepCityLongitude() << ") ";
 			cout << "at " << setfill('0') << setw(2) << m_vFlights[i]->getDepartureHour() << ":" << setw(2) << m_vFlights[i]->getDepartureMinute() << endl;
 			cout << "\tArrives: " << m_vFlights[i]->getDestination() << " (" << m_vFlights[i]->getDestCityLatitude() << ", " << m_vFlights[i]->getDestCityLongitude() << ") ";
 			cout << "at " << setfill('0') << setw(2) << m_vFlights[i]->getEstArrivalHour() << ":" << setw(2) << m_vFlights[i]->getEstArrivalMinute() << endl;
-			cout << "\tCurrent location: (" << m_vFlights[i]->getCurrentLatitude() << ", " << m_vFlights[i]->getCurrentLongitude() << ")" << endl;
+			cout << "\tCurrent location: (" << m_vFlights[i]->getAircraft()->getCurLatitude() << ", " << m_vFlights[i]->getAircraft()->getCurLongitude() << ")" << endl;
 			cout << "\t\t" << m_vFlights[i]->getDistanceFromStart() << " miles from " << m_vFlights[i]->getDepartureLocation() << ", " << m_vFlights[i]->getDistanceToDestination();
 			cout << " miles to " << m_vFlights[i]->getDestination() << endl;
 			cout << "\tCurrent Speed: " << m_vFlights[i]->getCurrentSpeed() << " MPH" << endl;
-			cout << "\tCurrent altitude: " << m_vFlights[i]->getCurrentAltitude() << " feet" << endl;
+			cout << "\tCurrent altitude: " << m_vFlights[i]->getAircraft()->getCurAltitude() << " feet" << endl;
 		}
 	}
 
@@ -586,7 +575,7 @@ void SimDataCollector::displayScheduledReport(int currentHour, int currentMinute
 void SimDataCollector::displayTakeoffReport(int index, int currentHour, int currentMinute)
 {
 	cout << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
-	cout << "Now departing: " << m_vFlights[index]->getAirline() << " flight " << m_vFlights[index]->getFlightNumber() << ", " << m_vFlights[index]->getPlaneType() << endl;
+	cout << "Now departing: " << m_vFlights[index]->getAirline() << " flight " << m_vFlights[index]->getFlightNumber() << ", " << m_vFlights[index]->getAircraft()->getSharedAircraft()->getMake() << endl;
 	cout << "\tFrom " << m_vFlights[index]->getDepCityName() << ", " << m_vFlights[index]->getDepStateName() << endl;
 	cout << "\t\tenroute to " << m_vFlights[index]->getDestCityName() << ", " << m_vFlights[index]->getDestStateName() << endl;
 	cout << "Estimated Time of Arrival: " << setfill('0') << setw(2) << m_vFlights[index]->getEstArrivalHour() << ":" << setw(2) << m_vFlights[index]->getEstArrivalMinute() << endl;
@@ -600,7 +589,7 @@ void SimDataCollector::displayTakeoffReport(int index, int currentHour, int curr
 void SimDataCollector::displayLandingReport(int index, int currentHour, int currentMinute)
 {
 	cout << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
-	cout << "Now arriving: " << m_vFlights[index]->getAirline() << " flight " << m_vFlights[index]->getFlightNumber() << ", " << m_vFlights[index]->getPlaneType() << endl;
+	cout << "Now arriving: " << m_vFlights[index]->getAirline() << " flight " << m_vFlights[index]->getFlightNumber() << ", " << m_vFlights[index]->getAircraft()->getSharedAircraft()->getMake() << endl;
 	cout << "\t\tAt " << m_vFlights[index]->getDestCityName() << ", " << m_vFlights[index]->getDestStateName() << endl;
 	cout << "\t\tFrom " << m_vFlights[index]->getDepCityName() << ", " << m_vFlights[index]->getDepStateName() << endl;
 	cout << "Current clock time: " << setfill('0') << setw(2) << currentHour << ":" << setw(2) << currentMinute << endl;

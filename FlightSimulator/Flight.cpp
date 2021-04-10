@@ -36,9 +36,9 @@ void Flight::setAirline(char* airline)
 	strcpy(m_sAirline, airline);
 }
 
-void Flight::setPlaneType(char* planeType)
+void Flight::setAircraft(Aircraft* ac)
 {
-	strcpy(m_sPlaneType, planeType);
+	m_ac = ac;
 }
 
 void Flight::setFlightNumber(int flightNumber)
@@ -153,34 +153,9 @@ void Flight::setDestStateName(char* state)
 	strcpy(m_sDestStateName, state);
 }
 
-void Flight::setCurrentAltitude(double altitude)
-{
-	m_dCurrentAltitude = altitude;
-}
-
-void Flight::setCurrentLatitude(double latitude)
-{
-	m_dCurrentLatitude = latitude;
-}
-
-void Flight::setCurrentLongitude(double longitude)
-{
-	m_dCurrentLongitude = longitude;
-}
-
-void Flight::setCruiseAltitude(double altitude)
-{
-	m_dCruiseAltitude = altitude;
-}
-
-void Flight::setRateOfClimb(double roc)
-{
-	m_dRateOfClimb = roc;
-}
-
 void Flight::setCurrentSpeed(double speed)
 {
-	m_dCurrentSpeed = speed;
+	m_dCurSpeed = speed;
 }
 
 void Flight::setTripTime(double tripTime)
@@ -218,9 +193,9 @@ char* Flight::getAirline()
 	return m_sAirline;
 }
 
-char* Flight::getPlaneType()
+Aircraft* Flight::getAircraft()
 {
-	return m_sPlaneType;
+	return m_ac;
 }
 
 int Flight::getFlightNumber()
@@ -329,34 +304,9 @@ char* Flight::getDestStateName()
 	return m_sDestStateName;
 }
 
-double Flight::getCurrentAltitude()
-{
-	return m_dCurrentAltitude;
-}
-
-double Flight::getCurrentLatitude()
-{
-	return m_dCurrentLatitude;
-}
-
-double Flight::getCurrentLongitude()
-{
-	return m_dCurrentLongitude;
-}
-
-double Flight::getCruiseAltitude()
-{
-	return m_dCruiseAltitude;
-}
-
-double Flight::getRateOfClimb()
-{
-	return m_dRateOfClimb;
-}
-
 double Flight::getCurrentSpeed()
 {
-	return m_dCurrentSpeed;
+	return m_dCurSpeed;
 }
 
 double Flight::getTripTime()
@@ -389,16 +339,20 @@ bool Flight::getOngoingFlag()
 	return m_bOngoing;
 }
 
-void Flight::updateLatitude()
+double Flight::updateLatitude()
 {
 	double timeFraction = (m_dCurrentTime - m_dDepartureTime) / m_dTripTime; // Elapsed time / total trip time
-	m_dCurrentLatitude = m_dDepCityLatitude + (m_dDestCityLatitude - m_dDepCityLatitude) * timeFraction; // Update the latitude
+	double currentLatitude = m_dDepCityLatitude + (m_dDestCityLatitude - m_dDepCityLatitude) * timeFraction; // Update the latitude
+
+	return currentLatitude;
 }
 
-void Flight::updateLongitude()
+double Flight::updateLongitude()
 {
 	double timeFraction = (m_dCurrentTime - m_dDepartureTime) / m_dTripTime; // Elapsed time / total trip time
-	m_dCurrentLongitude = m_dDepCityLongitude + (m_dDestCityLongitude - m_dDepCityLongitude) * timeFraction; // Update the longitude
+	double currentLongitude = m_dDepCityLongitude + (m_dDestCityLongitude - m_dDepCityLongitude) * timeFraction; // Update the longitude
+
+	return currentLongitude;
 }
 
 void Flight::updateDistanceFromCities()
@@ -408,24 +362,26 @@ void Flight::updateDistanceFromCities()
 	m_dDistanceToDestination = m_dTotalDistance - m_dDistanceFromStart; // Update the distance to the destination city
 }
 
-void Flight::updateAltitude()
+double Flight::updateAltitude()
 {
-	double possibleAltitude = ((m_dCurrentTime * 60.0) - (m_dDepartureTime * 60.0)) * m_dRateOfClimb; // Gives an altitude in feet (minutes * feet/minute)
+	double possibleAltitude = ((m_dCurrentTime * 60.0) - (m_dDepartureTime * 60.0)) * m_ac->getSharedAircraft()->getRateOfClimb(); // Gives an altitude in feet (minutes * feet/minute)
+	int currentAltitude;
 
 	if (m_dCurrentTime >= m_dTimeStartDescending) // At a point in the flight when we need to descend
 	{
 		double timeLeft = m_dEstArrivalTime - m_dCurrentTime; // Gets smaller as the flight approaches the destination
-		m_dCurrentAltitude = (timeLeft * 60.0) * m_dRateOfClimb; // Time left in minutes * rate of climb in feet/min gives current altitude in feet
+		currentAltitude = (timeLeft * 60.0) * m_ac->getSharedAircraft()->getRateOfClimb(); // Time left in minutes * rate of climb in feet/min gives current altitude in feet
 	}
-	else if (possibleAltitude >= m_dCruiseAltitude) // Don't need to descend, and the new altitude would pass the cruise altitude. Just use the cruise altitude
+	else if (possibleAltitude >= m_ac->getSharedAircraft()->getCruiseAltitude()) // Don't need to descend, and the new altitude would pass the cruise altitude. Just use the cruise altitude
 	{
-		m_dCurrentAltitude = m_dCruiseAltitude;
+		currentAltitude = m_ac->getSharedAircraft()->getCruiseAltitude();
 	}
 	else // The flight is ascending and at an altitude below its cruise altitude
 	{
-		m_dCurrentAltitude = possibleAltitude;
+		currentAltitude = possibleAltitude;
 	}
 	
+	return currentAltitude;
 }
 
 //-----------------------------------------
@@ -439,7 +395,7 @@ void Flight::updateAltitude()
 //-----------------------------------------
 void Flight::calculateAltitudeChangeTimes()
 {
-	double hoursReachCruiseAlt = (m_dCruiseAltitude / m_dRateOfClimb) / 60.0; // Calculate how many hours it takes to reach cruise altitude
+	double hoursReachCruiseAlt = (m_ac->getSharedAircraft()->getCruiseAltitude() / m_ac->getSharedAircraft()->getRateOfClimb()) / 60.0; // Calculate how many hours it takes to reach cruise altitude
 	double hoursReachCruiseAltAndGround = hoursReachCruiseAlt * 2.0; // This is how long it takes to reach cruise altitude and reach the ground from cruise altitude
 	m_dTimeReachCruiseAlt = m_dDepartureTime + hoursReachCruiseAlt; // Gets the time in hours when this cruise altitude will be reached
 	double timeReachCruiseAltAndGround = m_dDepartureTime + hoursReachCruiseAltAndGround; // The time the plane would land if it reached cruise altitude then landed from there
