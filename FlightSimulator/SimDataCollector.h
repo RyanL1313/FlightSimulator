@@ -2,6 +2,9 @@
 // SimDataCollector.h
 // Interface file for the SimDataCollector class.
 //
+// This class facilitates the transfer of data between the
+// parsers and the Simulation class instance.
+//
 // Author: Ryan Lynch
 // Date: April 2021
 //========================================================
@@ -41,7 +44,6 @@ private:
 	fstream* m_dataFileNamesGrabber; // Will point to the file containing the names of the XML data files
 	AircraftFactory* m_AircraftFactory; // Points to a specific aircraft factory
 	AircraftFlyweightFactory* m_aff; // Points to the singleton AircraftFlyweightFactory object
-	vector<SharedAircraft*> m_vSharedAircrafts; // Vector of pointers to all SharedAircraft objects
 	vector<Flight*> m_vFlights; // Vector of pointers to all Flight objects
 	vector<City*> m_vCities; // Vector of pointers to all City objects
 	double* m_pdCityDistances; // Pointer to an array of doubles containing distances from all cities to each other

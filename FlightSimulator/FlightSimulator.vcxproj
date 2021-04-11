@@ -134,7 +134,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PassengerAircraftFactory.cpp" />
     <ClCompile Include="SharedAircraft.cpp" />
-    <ClCompile Include="SharedBusinessAircraftFactory.cpp" />
+    <ClCompile Include="SharedBusinessAircraft.cpp" />
     <ClCompile Include="SharedPassengerAircraft.cpp" />
     <ClCompile Include="SharedSingleEngineAircraft.cpp" />
     <ClCompile Include="SimDataCollector.cpp" />

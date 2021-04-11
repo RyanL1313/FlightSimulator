@@ -1,14 +1,1 @@
-﻿  Aircraft.cpp
-  AircraftFactory.cpp
-  AircraftFlyweightFactory.cpp
-c:\users\ryan\source\repos\flightsimulator\flightsimulator\aircraftflyweightfactory.cpp(10): warning C4018: '<': signed/unsigned mismatch
-c:\users\ryan\source\repos\flightsimulator\flightsimulator\aircraftflyweightfactory.cpp(31): warning C4018: '<': signed/unsigned mismatch
-c:\users\ryan\source\repos\flightsimulator\flightsimulator\aircraftflyweightfactory.cpp(44): warning C4018: '<': signed/unsigned mismatch
-  BusinessAircraftFactory.cpp
-  PassengerAircraftFactory.cpp
-  SimDataCollector.cpp
-  Simulation.cpp
-  SingleEngineAircraftFactory.cpp
-  main.cpp
-  Generating Code...
-  FlightSimulator.vcxproj -> C:\Users\Ryan\source\repos\FlightSimulator\Debug\FlightSimulator.exe
+﻿  FlightSimulator.vcxproj -> C:\Users\Ryan\source\repos\FlightSimulator\Debug\FlightSimulator.exe

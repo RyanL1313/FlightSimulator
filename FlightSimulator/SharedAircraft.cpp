@@ -53,9 +53,9 @@ void SharedAircraft::setCruiseSpeed(double cruiseSpeed)
 	m_dCruiseSpeed = cruiseSpeed;
 }
 
-void SharedAircraft::setCruiseAltitude(double cruiseAltitude)
+void SharedAircraft::setCruiseAltitude(int cruiseAltitude)
 {
-	m_dCruiseAltitude = cruiseAltitude;
+	m_iCruiseAltitude = cruiseAltitude;
 }
 
 char* SharedAircraft::getMake()
@@ -88,7 +88,7 @@ double SharedAircraft::getCruiseSpeed()
 	return m_dCruiseSpeed;
 }
 
-double SharedAircraft::getCruiseAltitude()
+int SharedAircraft::getCruiseAltitude()
 {
-	return m_dCruiseAltitude;
+	return m_iCruiseAltitude;
 }

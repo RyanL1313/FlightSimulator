@@ -25,19 +25,16 @@ SimDataCollector::SimDataCollector()
 //------------------------------------------
 SimDataCollector::~SimDataCollector()
 {
-	// Delete the parser/file pointers
 	delete m_fdp;
 	delete m_cdp;
 	delete m_dataFileNamesGrabber;
+	delete m_AircraftFactory;
+	delete m_aff;
+
 
 	for (int i = 0; i < m_iCityCount; i++)
 	{
 		delete m_vCities[i]; // Delete a city object pointer in m_vCities
-	}
-
-	for (int i = 0; i < m_iAircraftCount; i++)
-	{
-		delete m_vSharedAircrafts[i]; // Delete an aircraft object pointer in m_vAircrafts
 	}
 
 	for (int i = 0; i < m_iFlightCount; i++)
@@ -249,6 +246,7 @@ void SimDataCollector::setAllFlightData()
 		// Set all of the flight data
 		tempFlight->setAirline(airline);
 
+		// These three lines implement the Flyweight pattern
 		tempSharedAircraft = m_aff->getSharedAircraft(planeMake); // Get the SharedAircraft instance from the flyweight factory corresponding to the make
 		tempAircraft->setSharedAircraft(tempSharedAircraft); // Make the flight's Aircraft object have a pointer to the correct SharedAircraft object
 		tempFlight->setAircraft(tempAircraft); // Set the flight's Aircraft object
@@ -261,13 +259,13 @@ void SimDataCollector::setAllFlightData()
 		tempFlight->setDestination(destination);
 
 		m_vFlights.push_back(tempFlight);
-
-		// Free the memory
-		tempFlight = new Flight();
-		tempAircraft = new Aircraft();
-		delete tempFlight, tempAircraft;
-		tempFlight, tempAircraft = nullptr;
 	}
+
+	// Free the memory
+	tempFlight = new Flight();
+	tempAircraft = new Aircraft();
+	delete tempFlight, tempAircraft;
+	tempFlight, tempAircraft = nullptr;
 }
 
 //-------------------------------------------------------

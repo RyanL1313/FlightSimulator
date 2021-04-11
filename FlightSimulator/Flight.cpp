@@ -24,11 +24,11 @@ Flight::Flight()
 }
 
 //----------------------------------------
-// Deconstructor
+// Destructor
 //----------------------------------------
 Flight::~Flight()
 {
-
+	delete m_ac;
 }
 
 void Flight::setAirline(char* airline)
@@ -365,7 +365,7 @@ void Flight::updateDistanceFromCities()
 double Flight::updateAltitude()
 {
 	double possibleAltitude = ((m_dCurrentTime * 60.0) - (m_dDepartureTime * 60.0)) * m_ac->getSharedAircraft()->getRateOfClimb(); // Gives an altitude in feet (minutes * feet/minute)
-	int currentAltitude;
+	double currentAltitude;
 
 	if (m_dCurrentTime >= m_dTimeStartDescending) // At a point in the flight when we need to descend
 	{

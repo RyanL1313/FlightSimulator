@@ -1,3 +1,15 @@
+//========================================================
+// SingleEngineAircraftFactory.h
+// Header file for the SingleEngineAircraftFactory class.
+// 
+// Extends AircraftFactory to provide a means of creating
+// SharedSingleEngineAircraft objects and storing them in 
+// the AircraftFlyweightFactory instance.
+//
+// Author: Ryan Lynch
+// Date: April 2021
+//========================================================
+
 #pragma once
 #include "AircraftFactory.h"
 #include "SharedSingleEngineAircraft.h"

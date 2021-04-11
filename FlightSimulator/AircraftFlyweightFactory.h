@@ -1,3 +1,15 @@
+//=====================================================================
+// AircraftFlyweightFactory.h
+// Header file for the AircraftFlyweightFactory class.
+// 
+// Stores all pointers to SharedAircraft instances that have distinct
+// plane makes. Each Aircraft object that gets created will
+// store a pointer to one of these SharedAircraft objects.
+//
+// Author: Ryan Lynch
+// Date: April 2021
+//=====================================================================
+
 #include "SharedAircraft.h"
 #include <vector>
 #include <string.h>

@@ -1,3 +1,15 @@
+//========================================================
+// PassengerAircraftFactory.h
+// Header file for the PassengerAircraftFactory class.
+// 
+// Extends AircraftFactory to provide a means of creating
+// SharedPassengerAircraft objects and storing them in 
+// the AircraftFlyweightFactory instance.
+//
+// Author: Ryan Lynch
+// Date: April 2021
+//========================================================
+
 #pragma once
 #include "AircraftFactory.h"
 #include "SharedPassengerAircraft.h"
