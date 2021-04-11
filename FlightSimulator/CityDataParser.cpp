@@ -37,7 +37,7 @@ CityDataParser::~CityDataParser()
 CityDataParser *CityDataParser::getInstance()
 {
 	static CityDataParser *instance = NULL;
-	if(instance == NULL)
+	if (instance == NULL)
 	{
 		instance = new CityDataParser();
 	}
@@ -53,7 +53,7 @@ void CityDataParser::InitCityData(const char *dataFile)
 	// Try to open the file
 	inFile = new fstream();
 	inFile->open(dataFile, fstream::in); // Open the data file
-	if(!inFile->is_open())
+	if (!inFile->is_open())
 	{
 		cout << "Failed to open the City Data file.\nProgram terminating...\n";
 		exit(0);
@@ -61,9 +61,9 @@ void CityDataParser::InitCityData(const char *dataFile)
 	m_bDataFileOK = true; // flag the data file is good
 	// Read and count the number of cities
 	char line[128];
-	while(getNextLine(line, 127))
+	while (getNextLine(line, 127))
 	{
-		if(strcmp(line, "<CITY>") == 0)
+		if (strcmp(line, "<CITY>") == 0)
 		{
 			m_iCityCount++;	// Count all cities
 		}
@@ -96,48 +96,48 @@ bool CityDataParser::getCityData(char *name, char *state, char *symbol, double *
 	char line[128];
 	static int nextCityIdx = 0;
 	int thisCount = 0;
-	if(nextCityIdx >= m_iCityCount)
+	if (nextCityIdx >= m_iCityCount)
 		return false; // All cities have been read
 
 	// Open the data file and search for the city
 	inFile = new fstream();
 	inFile->open(m_sDataFile, fstream::in); // Open the data file
-	if(!inFile->is_open())
+	if (!inFile->is_open())
 	{
 		cout << "Failed to open the City Data file.\nProgram terminating...\n";
 		exit(0);
 	}
 
-	while(getNextLine(line, 127))
+	while (getNextLine(line, 127))
 	{
-		if(strcmp(line, "<CITY>") == 0)
+		if (strcmp(line, "<CITY>") == 0)
 		{
-			if(thisCount == nextCityIdx) // Want this one
+			if (thisCount == nextCityIdx) // Want this one
 			{
-				while(strcmp(line, "</CITY>") != 0)
+				while (strcmp(line, "</CITY>") != 0)
 				{
 					getNextLine(line, 127); // Read a line
-					if(strcmp(line, "<CITYNAME>") == 0)
+					if (strcmp(line, "<CITYNAME>") == 0)
 					{
 						getNextLine(line, 127); // Read city name
 						strcpy(name, line);
 					}
-					else if(strcmp(line, "<STATE>") == 0)
+					else if (strcmp(line, "<STATE>") == 0)
 					{
 						getNextLine(line, 127); // Read state name
 						strcpy(state, line);
 					}
-					else if(strcmp(line, "<SYMBOL>") == 0)
+					else if (strcmp(line, "<SYMBOL>") == 0)
 					{
 						getNextLine(line, 127); // Read city symbol
 						strcpy(symbol, line);
 					}
-					else if(strcmp(line, "<LATITUDE>") == 0)
+					else if (strcmp(line, "<LATITUDE>") == 0)
 					{
 						getNextLine(line, 127); // Read city symbol
 						*lat = atof(line);
 					}
-					else if(strcmp(line, "<LONGITUDE>") == 0)
+					else if (strcmp(line, "<LONGITUDE>") == 0)
 					{
 						getNextLine(line, 127); // Read city symbol
 						*lon = atof(line);
@@ -184,7 +184,7 @@ void CityDataParser::getCitySymbolsArray(char ***array)
 	*array = new char*[m_iCityCount + 1];
 	// Dynamically create all of the 4 character arrays
 	//  Remember: 4 chars because we need space for 3 char symbol plus NULL terminator
-	for(int i=0; i<m_iCityCount; i++)
+	for (int i = 0; i < m_iCityCount; i++)
 	{
 		(*array)[i] = new char[4];
 	}
@@ -193,7 +193,7 @@ void CityDataParser::getCitySymbolsArray(char ***array)
 	// Open data file for reading
 	inFile = new fstream();
 	inFile->open(m_sDataFile, fstream::in); // Open the data file
-	if(!inFile->is_open())
+	if (!inFile->is_open())
 	{
 		cout << "Failed to open the City Data file.\nProgram terminating...\n";
 		exit(0);
@@ -202,9 +202,9 @@ void CityDataParser::getCitySymbolsArray(char ***array)
 	int nextIdx = 0;
 	char line[128];
 
-	while(getNextLine(line, 127))
+	while (getNextLine(line, 127))
 	{
-		if(strcmp(line, "<SYMBOL>") == 0)
+		if (strcmp(line, "<SYMBOL>") == 0)
 		{
 			getNextLine(line, 127); // Read the symbol
 			strcpy((*array)[nextIdx], line);
@@ -258,20 +258,20 @@ void CityDataParser::getDistTable(double **array)
 	// Open the data file and search for the city
 	inFile = new fstream();
 	inFile->open(m_sDataFile, fstream::in); // Open the data file
-	if(!inFile->is_open())
+	if (!inFile->is_open())
 	{
 		cout << "Failed to open the City Data file.\nProgram terminating...\n";
 		exit(0);
 	}
 
 	int idx = 0;
-	while(getNextLine(line, 127))
+	while (getNextLine(line, 127))
 	{
-		if(strcmp(line, "<ROWS>") == 0) // Look for start of the table
+		if (strcmp(line, "<ROWS>") == 0) // Look for start of the table
 		{
-			while(getNextLine(line, 127))
+			while (getNextLine(line, 127))
 			{
-				if(strcmp(line, "<DISTANCE>") == 0) // Got a distance
+				if (strcmp(line, "<DISTANCE>") == 0) // Got a distance
 				{
 					getNextLine(line, 127); // Read the distance line
 					(*array)[idx] = atof(line);
@@ -297,39 +297,39 @@ void CityDataParser::getDistTable(double **array)
 //------------------------------------------------
 bool CityDataParser::getNextLine(char *buffer, int n)
 {
-    bool    done = false;
+	bool    done = false;
 	char    tempBuf[128];
 	char	*temp;
-    while(!done)
-    {
-        inFile->getline(tempBuf, n); // Read a line from the file
+	while (!done)
+	{
+		inFile->getline(tempBuf, n); // Read a line from the file
 
-        if(inFile->good())          // If a line was successfully read check it
-        {
-           if(strlen(tempBuf) == 0)     // Skip any blank lines
-               continue;
-		   else if(strncmp(tempBuf, "<!--", 4) == 0) // Skip comment lines
-			   continue;
-           else done = true;    // Got a valid data line so return with this line
-        }
-        else
-        {
-            strcpy(buffer, "");  // Clear the buffer array
-            return false;        // Flag end of file
-        }
-    } // end while
+		if (inFile->good())          // If a line was successfully read check it
+		{
+			if (strlen(tempBuf) == 0)     // Skip any blank lines
+				continue;
+			else if (strncmp(tempBuf, "<!--", 4) == 0) // Skip comment lines
+				continue;
+			else done = true;    // Got a valid data line so return with this line
+		}
+		else
+		{
+			strcpy(buffer, "");  // Clear the buffer array
+			return false;        // Flag end of file
+		}
+	} // end while
 	// Remove white space from end of string
 	temp = &tempBuf[strlen(tempBuf)]; // point to closing \0
 	temp--; // back up 1 space
-	while(isspace(*temp))
+	while (isspace(*temp))
 	{
 		*temp = '\0'; // Make it another NULL terminator
 		temp--;  // Back up 1 char
 	}
 	// Remove white space from front of string
 	temp = tempBuf;
-	while(isspace(*temp)) temp++; // Skip leading white space
+	while (isspace(*temp)) temp++; // Skip leading white space
 	// Copy remainder of string into the buffer
 	strcpy(buffer, temp);
-    return true;  // Flag a successful read
+	return true;  // Flag a successful read
 }

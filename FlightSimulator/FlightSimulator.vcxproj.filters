@@ -33,12 +33,6 @@
     <ClCompile Include="Simulation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Desktop\College\CS 307\Program 2 Example\CityDataParser.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\Desktop\College\CS 307\Program 2 Example\FlightDataParser.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="AircraftFactory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -66,6 +60,12 @@
     <ClCompile Include="SharedBusinessAircraft.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CityDataParser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FlightDataParser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Aircraft.h">
@@ -81,12 +81,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SimDataCollector.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\Desktop\College\CS 307\Program 2 Example\CityDataParser.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\Desktop\College\CS 307\Program 2 Example\FlightDataParser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SharedAircraft.h">
@@ -117,6 +111,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AircraftTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CityDataParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FlightDataParser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
